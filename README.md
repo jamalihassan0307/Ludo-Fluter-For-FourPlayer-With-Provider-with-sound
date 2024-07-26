@@ -1,26 +1,21 @@
 # NLudo Flutter
 Ludo Game made with Flutter
 
-[Play now!](https://nizwar.github.io/ludo_flutter/)
+[Play now!](https://jamalihassan0307.github.io/Ludo-Fluter-For-FourPlayer-With-Provider-with-sound/)
 
 ## TODO : 
 * Multiplayer
 * Write description how the game work
 
 ## LICENSE
-```license
-Copyright 2022 - Mochamad Nizwar Syafuan
+![video_8](https://github.com/jamalihassan0307/Ludo-Fluter-For-FourPlayer-With-Provider-with-sound/blob/main/assets/Copy%20of%20Flutter%20App%20UI%20(1).png)
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-```
+<p align="center">
+  <img src="https://github.com/jamalihassan0307/Ludo-Fluter-For-FourPlayer-With-Provider-with-sound/blob/main/assets/XRecorder_26072024_210736.gif" width="350px">
+  <img src="https://github.com/jamalihassan0307/Ludo-Fluter-For-FourPlayer-With-Provider-with-sound/blob/main/assets/Screenshot_20240726-205710.png" width="350px">
+  <img src="https://github.com/jamalihassan0307/Ludo-Fluter-For-FourPlayer-With-Provider-with-sound/blob/main/assets/Screenshot_20240726-205718.png" width="350px">
+  <img src="https://github.com/jamalihassan0307/Ludo-Fluter-For-FourPlayer-With-Provider-with-sound/blob/main/assets/Screenshot_20240726-210530.png" width="350px">
+  <img src="https://github.com/jamalihassan0307/Ludo-Fluter-For-FourPlayer-With-Provider-with-sound/blob/main/assets/Screenshot_20240726-210559.png" width="350px">
+  <img src="https://github.com/jamalihassan0307/Ludo-Fluter-For-FourPlayer-With-Provider-with-sound/blob/main/assets/Screenshot_20240726-210644.png" width="350px">
+  <img src="https://github.com/jamalihassan0307/Ludo-Fluter-For-FourPlayer-With-Provider-with-sound/blob/main/assets/Screenshot_20240726-210712.png" width="350px">
+</p>
