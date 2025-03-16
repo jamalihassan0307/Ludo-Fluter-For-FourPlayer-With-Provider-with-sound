@@ -7,7 +7,7 @@ import 'package:ludo_flutter/data/models/leaderboard_entry.dart';
 class StorageService {
   static late Box _settingsBox;
   static late Box<UserModel> _userBox;
-  static late Box<GameStateModel> _gameStateBox;
+  static late Box _gameStateBox;
   static late Box<LeaderboardEntry> _leaderboardBox;
 
   static Future<void> init() async {
@@ -22,13 +22,13 @@ class StorageService {
     // Open boxes
     _settingsBox = await Hive.openBox('settings');
     _userBox = await Hive.openBox<UserModel>('user');
-    _gameStateBox = await Hive.openBox<GameStateModel>('gameState');
+    _gameStateBox = await Hive.openBox('gameState');
     _leaderboardBox = await Hive.openBox<LeaderboardEntry>('leaderboard');
   }
 
   static Box getSettingsBox() => _settingsBox;
   static Box<UserModel> getUserBox() => _userBox;
-  static Box<GameStateModel> getGameStateBox() => _gameStateBox;
+  static Box getGameStateBox() => _gameStateBox;
 
   static Future<void> saveUser(UserModel user) async {
     await _userBox.put('currentUser', user);
@@ -47,16 +47,17 @@ class StorageService {
   }
 
   static Future<void> saveGameState(GameStateModel gameState) async {
-    await _gameStateBox.put('currentGame', gameState);
+    await _gameStateBox.put('currentGame', gameState.toJson());
   }
 
   static GameStateModel? getGameState() {
-    return _gameStateBox.get('currentGame');
+    final data = _gameStateBox.get('currentGame');
+    if (data == null) return null;
+    return GameStateModel.fromJson(Map<String, dynamic>.from(data));
   }
 
   static Future<void> clearGameState() async {
-    final box = getGameStateBox();
-    await box.delete('currentGame');
+    await _gameStateBox.delete('currentGame');
   }
 
   static Future<void> updateLeaderboard(String userId, bool won) async {
