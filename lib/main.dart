@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:ludo_flutter/main_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'ludo_provider.dart';
 
-main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  return runApp(ChangeNotifierProvider(
+  await Firebase.initializeApp();
+
+  runApp(ChangeNotifierProvider(
     create: (_) => LudoProvider()..startGame(),
     child: const Root(),
   ));

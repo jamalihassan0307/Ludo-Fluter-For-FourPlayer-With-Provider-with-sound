@@ -1,0 +1,184 @@
+{
+  "project_info": {
+    "project_number": "76587901162",
+    "project_id": "day2-b856b",
+    "storage_bucket": "day2-b856b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76587901162:android:c8badbbd7c9fbc830ef793",
+        "android_client_info": {
+          "package_name": "com.example.agoravideocall"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "103673764399543017278",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgivlmQsKDDIg014G6tzFwKzLmWl2ua0M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103673764399543017278",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76587901162:android:dda79c364365a69f0ef793",
+        "android_client_info": {
+          "package_name": "com.example.day1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "103673764399543017278",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgivlmQsKDDIg014G6tzFwKzLmWl2ua0M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103673764399543017278",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76587901162:android:65b5935b0db43f4c0ef793",
+        "android_client_info": {
+          "package_name": "com.example.day2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "103673764399543017278",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgivlmQsKDDIg014G6tzFwKzLmWl2ua0M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103673764399543017278",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76587901162:android:9692618f6f1a7cb40ef793",
+        "android_client_info": {
+          "package_name": "com.example.flutter_live_streaming_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "103673764399543017278",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgivlmQsKDDIg014G6tzFwKzLmWl2ua0M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103673764399543017278",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76587901162:android:0b0b6de8482f1bb60ef793",
+        "android_client_info": {
+          "package_name": "com.example.vpn_basic_project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "103673764399543017278",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgivlmQsKDDIg014G6tzFwKzLmWl2ua0M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103673764399543017278",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76587901162:android:392f8fa6a4d21ed80ef793",
+        "android_client_info": {
+          "package_name": "com.ludoapp.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "103673764399543017278",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgivlmQsKDDIg014G6tzFwKzLmWl2ua0M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103673764399543017278",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
