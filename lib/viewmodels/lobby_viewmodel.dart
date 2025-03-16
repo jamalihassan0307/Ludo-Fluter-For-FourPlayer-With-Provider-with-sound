@@ -3,6 +3,8 @@ import '../core/services/navigation_service.dart';
 import '../core/constants/app_constants.dart';
 import '../data/models/player_model.dart';
 import '../core/services/storage_service.dart';
+import '../data/models/game_state_model.dart';
+import '../data/models/player_state.dart';
 
 class LobbyViewModel extends ChangeNotifier {
   final List<PlayerModel> _players = [];
@@ -20,7 +22,7 @@ class LobbyViewModel extends ChangeNotifier {
   void _initializeLobby() {
     final settings = StorageService.getSettingsBox();
     _gameMode = settings.get('gameMode', defaultValue: 'local');
-    
+
     // Add first player
     addPlayer(PlayerModel(
       id: '1',
@@ -53,11 +55,21 @@ class LobbyViewModel extends ChangeNotifier {
 
   void startGame() {
     // Save current players to game state
-    StorageService.saveGameState({
-      'players': _players.map((p) => p.toJson()).toList(),
-      'gameMode': _gameMode,
-    });
-    
+    StorageService.saveGameState(GameStateModel(
+      id: DateTime.now().toString(),
+      createdAt: DateTime.now(),
+      players: _players
+          .map((p) => PlayerState(
+                id: p.id,
+                name: p.name,
+                type: p.type.toString(),
+                pawnPositions: p.pawns.map((pawn) => pawn.step).toList(),
+              ))
+          .toList(),
+      gameMode: _gameMode,
+      isCompleted: false,
+    ));
+
     NavigationService.navigateTo(AppConstants.gameRoute);
   }
-} 
+}
