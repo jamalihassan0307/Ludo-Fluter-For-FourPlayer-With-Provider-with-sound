@@ -51,7 +51,17 @@ class LudoProvider extends ChangeNotifier {
   ///Player win, we use `LudoPlayerType` to make it easier to check
   final List<LudoPlayerType> winners = [];
 
-  LudoPlayer player(LudoPlayerType type) => players.firstWhere((element) => element.type == type);
+  LudoPlayer player(LudoPlayerType type) {
+    try {
+      return players.firstWhere(
+        (element) => element.type == type,
+        orElse: () => LudoPlayer(type), // Provide default player
+      );
+    } catch (e) {
+      print('Error getting player: $e');
+      return LudoPlayer(type); // Return default player on error
+    }
+  }
 
   ///This method will check if the pawn can kill another pawn or not by checking the step of the pawn
   bool checkToKill(LudoPlayerType type, int index, int step, List<List<double>> path) {
@@ -231,8 +241,14 @@ class LudoProvider extends ChangeNotifier {
 
   ///Next turn will be called when the player finish the turn
   void nextTurn() {
-    final currentIndex = players.indexOf(currentPlayer);
-    currentTurn = LudoPlayerType.values[(currentIndex + 1) % 4];
+    // Only switch between green and red
+    currentTurn = currentTurn == LudoPlayerType.green ? LudoPlayerType.red : LudoPlayerType.green;
+
+    if (winners.contains(currentTurn)) {
+      nextTurn();
+      return;
+    }
+
     _gameState = LudoGameState.throwDice;
     notifyListeners();
   }
@@ -253,9 +269,10 @@ class LudoProvider extends ChangeNotifier {
   void startGame() {
     winners.clear();
     players.clear();
+    // Only add green and red players for 2-player game
     players.addAll([
-      LudoPlayer(LudoPlayerType.green, name: 'Player 1'),
-      LudoPlayer(LudoPlayerType.red, name: 'Player 2'),
+      LudoPlayer(LudoPlayerType.green),
+      LudoPlayer(LudoPlayerType.red),
     ]);
     currentTurn = LudoPlayerType.green;
     _gameState = LudoGameState.throwDice;
