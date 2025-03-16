@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ludo_flutter/core/constants/app_constants.dart';
 // import 'package:flutter/scheduler.dart';
 import 'package:ludo_flutter/core/services/navigation_service.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:ludo_flutter/core/services/storage_service.dart';
 import 'ui/views/splash/splash_view.dart';
 import 'viewmodels/splash_viewmodel.dart';
+import 'viewmodels/onboarding_viewmodel.dart';
 
 import 'ludo_provider.dart';
 
@@ -23,6 +25,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => SplashViewModel()),
+        ChangeNotifierProvider(create: (_) => OnboardingViewModel()),
         ChangeNotifierProvider(create: (_) => LudoProvider()..startGame()),
       ],
       child: const Root(),
@@ -36,6 +39,8 @@ class Root extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: AppConstants.appName,
       navigatorKey: NavigationService.navigatorKey,
       home: const SplashView(),
     );

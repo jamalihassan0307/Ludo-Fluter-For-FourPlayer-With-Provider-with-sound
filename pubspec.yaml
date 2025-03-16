@@ -49,3 +49,7 @@ flutter:
     - assets/images/crown/
     - assets/sounds/
     - assets/logo.jpg
+    - assets/walkthrough/
+    - assets/walkthrough/game.png
+    - assets/walkthrough/logo_gaming.jpg
+    - assets/walkthrough/two_dies.webp
