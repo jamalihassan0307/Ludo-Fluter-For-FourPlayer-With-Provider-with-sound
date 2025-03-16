@@ -105,15 +105,15 @@ class _GameViewContentState extends State<_GameViewContent> {
         body: Consumer<LudoProvider>(
           builder: (context, provider, _) {
             return Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.9, // 90% of screen width
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
                     // Game Board
                     const BoardWidget(),
 
-                    // Player 1 (Green) - Top
+                    // Top Player (Green)
                     Positioned(
                       top: 20,
                       child: Column(
@@ -124,79 +124,82 @@ class _GameViewContentState extends State<_GameViewContent> {
                                 ? 'Player 1'
                                 : provider.players
                                     .firstWhere(
-                                      (p) => p.type == PlayerType.green,
+                                      (p) => p.type == LudoPlayerType.green,
                                       orElse: () => LudoPlayer(LudoPlayerType.green, name: 'Player 1'),
                                     )
                                     .name,
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: provider.currentTurn == PlayerType.green
+                              color: provider.currentTurn == LudoPlayerType.green
                                   ? Colors.green
                                   : Colors.green.withOpacity(0.5),
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 4,
+                          GestureDetector(
+                            onTap: provider.currentTurn == LudoPlayerType.green ? () => provider.throwDice() : null,
+                            child: Opacity(
+                              opacity: provider.currentTurn == LudoPlayerType.green ? 1.0 : 0.5,
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4)],
                                 ),
-                              ],
-                            ),
-                            child: const SizedBox(
-                              width: 50,
-                              height: 50,
-                              child: DiceWidget(),
+                                child: const SizedBox(
+                                  width: 50,
+                                  height: 50,
+                                  child: DiceWidget(),
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
 
-                    // Player 2 (Red) - Bottom
+                    // Bottom Player (Red)
                     Positioned(
                       bottom: 20,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          GestureDetector(
+                            onTap: provider.currentTurn == LudoPlayerType.red ? () => provider.throwDice() : null,
+                            child: Opacity(
+                              opacity: provider.currentTurn == LudoPlayerType.red ? 1.0 : 0.5,
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4)],
+                                ),
+                                child: const SizedBox(
+                                  width: 50,
+                                  height: 50,
+                                  child: DiceWidget(),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
                           Text(
                             provider.players.isEmpty
                                 ? 'Player 2'
                                 : provider.players
                                     .firstWhere(
-                                      (p) => p.type == PlayerType.red,
+                                      (p) => p.type == LudoPlayerType.red,
                                       orElse: () => LudoPlayer(LudoPlayerType.red, name: 'Player 2'),
                                     )
                                     .name,
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: provider.currentTurn == PlayerType.red ? Colors.red : Colors.red.withOpacity(0.5),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 4,
-                                ),
-                              ],
-                            ),
-                            child: const SizedBox(
-                              width: 50,
-                              height: 50,
-                              child: DiceWidget(),
+                              color:
+                                  provider.currentTurn == LudoPlayerType.red ? Colors.red : Colors.red.withOpacity(0.5),
                             ),
                           ),
                         ],
