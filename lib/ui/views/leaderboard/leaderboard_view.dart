@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/services/storage_service.dart';
-import '../../../data/models/leaderboard_entry.dart';
+// import '../../../data/models/leaderboard_entry.dart';
 
 class LeaderboardView extends StatelessWidget {
   const LeaderboardView({Key? key}) : super(key: key);

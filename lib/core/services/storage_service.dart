@@ -74,4 +74,8 @@ class StorageService {
   static List<LeaderboardEntry> getLeaderboard() {
     return _leaderboardBox.values.toList()..sort((a, b) => b.gamesWon.compareTo(a.gamesWon));
   }
+
+  static UserModel? getUserById(String userId) {
+    return _userBox.get(userId);
+  }
 }
