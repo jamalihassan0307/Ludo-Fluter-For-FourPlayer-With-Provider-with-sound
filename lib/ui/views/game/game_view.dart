@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ludo_flutter/widgets/dice_widget.dart';
 import 'package:provider/provider.dart';
 import '../../../ludo_provider.dart';
-import '../../widgets/game/game_board.dart';
-// import '../../widgets/game/dice_widget.dart';
+import '../../../widgets/board_widget.dart';
+import '../../../widgets/dice_widget.dart';
 import '../../../constants.dart';
 import '../../../core/services/game_history_service.dart';
 import '../../../data/models/game_state_model.dart';

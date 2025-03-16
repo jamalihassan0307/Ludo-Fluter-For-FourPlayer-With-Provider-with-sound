@@ -1,25 +1,45 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart' as path_provider;
+import 'package:ludo_flutter/data/models/game_state_model.dart';
+import 'package:ludo_flutter/data/models/user_model.dart';
+// import '../models/user_model.dart';
 
 class StorageService {
+  static late Box _settingsBox;
+  static late Box<UserModel> _userBox;
+  static late Box _gameStateBox;
+
   static Future<void> init() async {
-    final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
-    await Hive.initFlutter(appDocumentDir.path);
+    await Hive.initFlutter();
     
-    // Register Hive Adapters here
-    // await Hive.registerAdapter(YourModelAdapter());
-    
-    // Open Hive boxes
-    await Hive.openBox('gameState');
-    await Hive.openBox('settings');
+    // Register adapters
+    Hive.registerAdapter(UserModelAdapter());
+    Hive.registerAdapter(GameStateModelAdapter());
+    Hive.registerAdapter(PlayerStateAdapter());
+
+    // Open boxes
+    _settingsBox = await Hive.openBox('settings');
+    _userBox = await Hive.openBox<UserModel>('user');
+    _gameStateBox = await Hive.openBox('gameState');
   }
 
-  static Box getGameStateBox() {
-    return Hive.box('gameState');
+  static Box getSettingsBox() => _settingsBox;
+  static Box<UserModel> getUserBox() => _userBox;
+  static Box getGameStateBox() => _gameStateBox;
+
+  static Future<void> saveUser(UserModel user) async {
+    await _userBox.put('currentUser', user);
   }
 
-  static Box getSettingsBox() {
-    return Hive.box('settings');
+  static UserModel? getCurrentUser() {
+    return _userBox.get('currentUser');
+  }
+
+  static bool isUserLoggedIn() {
+    return getCurrentUser() != null;
+  }
+
+  static Future<void> clearUser() async {
+    await _userBox.clear();
   }
 
   static Future<void> saveGameState(Map<String, dynamic> gameState) async {
