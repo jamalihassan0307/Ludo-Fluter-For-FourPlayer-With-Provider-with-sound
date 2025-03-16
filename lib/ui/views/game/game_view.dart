@@ -96,98 +96,52 @@ class _GameViewContentState extends State<_GameViewContent> {
       },
       child: Scaffold(
         body: Consumer<LudoProvider>(
-          builder: (context, value, child) {
-            return Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      BoardWidget(),
-                    ],
-                  ),
-                  // Dice positions for each player
-                  if (value.currentTurn == LudoPlayerType.green)
-                    Positioned(
-                      top: 100,
-                      left: 50,
-                      child: SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: DiceWidget(),
-                      ),
-                    ),
-                  if (value.currentTurn == LudoPlayerType.yellow)
-                    Positioned(
-                      top: 100,
-                      right: 50,
-                      child: SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: DiceWidget(),
-                      ),
-                    ),
-                  if (value.currentTurn == LudoPlayerType.red)
-                    Positioned(
-                      bottom: 100,
-                      left: 50,
-                      child: SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: DiceWidget(),
-                      ),
-                    ),
-                  if (value.currentTurn == LudoPlayerType.blue)
-                    Positioned(
-                      bottom: 100,
-                      right: 50,
-                      child: SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: DiceWidget(),
-                      ),
-                    ),
-                  // Game over overlay
-                  if (value.winners.length == 3)
-                    Container(
-                      color: Colors.black.withOpacity(0.8),
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset("assets/images/thankyou.gif"),
-                            const Text(
-                              "Game Over!",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            Text(
-                              "Winners: ${value.winners.map((e) => e.name.toUpperCase()).join(", ")}",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 40),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Back to Home'),
-                            ),
-                          ],
+          builder: (context, provider, _) {
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                const BoardWidget(),
+                
+                // Player 1 (Green) - Top
+                if (provider.currentTurn == PlayerType.green)
+                  Positioned(
+                    top: 20,
+                    child: Column(
+                      children: [
+                        Text(
+                          provider.players.firstWhere((p) => p.type == PlayerType.green).name,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                      ),
+                        const SizedBox(height: 8),
+                        const SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: DiceWidget(),
+                        ),
+                      ],
                     ),
-                ],
-              ),
+                  ),
+
+                // Player 2 (Red) - Bottom
+                if (provider.currentTurn == PlayerType.red)
+                  Positioned(
+                    bottom: 20,
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: DiceWidget(),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          provider.players.firstWhere((p) => p.type == PlayerType.red).name,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
             );
           },
         ),

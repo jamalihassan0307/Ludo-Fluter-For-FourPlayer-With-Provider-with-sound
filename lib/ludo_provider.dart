@@ -231,22 +231,8 @@ class LudoProvider extends ChangeNotifier {
 
   ///Next turn will be called when the player finish the turn
   void nextTurn() {
-    switch (currentTurn) {
-      case LudoPlayerType.green:
-        currentTurn = LudoPlayerType.yellow;
-        break;
-      case LudoPlayerType.yellow:
-        currentTurn = LudoPlayerType.blue;
-        break;
-      case LudoPlayerType.blue:
-        currentTurn = LudoPlayerType.red;
-        break;
-      case LudoPlayerType.red:
-        currentTurn = LudoPlayerType.green;
-        break;
-    }
-
-    if (winners.contains(currentTurn)) return nextTurn();
+    final currentIndex = players.indexOf(currentPlayer);
+    currentTurn = LudoPlayerType.values[(currentIndex + 1) % 4];
     _gameState = LudoGameState.throwDice;
     notifyListeners();
   }
@@ -268,11 +254,12 @@ class LudoProvider extends ChangeNotifier {
     winners.clear();
     players.clear();
     players.addAll([
-      LudoPlayer(LudoPlayerType.green),
-      LudoPlayer(LudoPlayerType.yellow),
-      LudoPlayer(LudoPlayerType.blue),
-      LudoPlayer(LudoPlayerType.red),
+      LudoPlayer(LudoPlayerType.green, name: 'Player 1'),
+      LudoPlayer(LudoPlayerType.red, name: 'Player 2'),
     ]);
+    currentTurn = LudoPlayerType.green;
+    _gameState = LudoGameState.throwDice;
+    notifyListeners();
   }
 
   @override

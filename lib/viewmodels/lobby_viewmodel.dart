@@ -22,14 +22,14 @@ class LobbyViewModel extends ChangeNotifier {
     final settings = StorageService.getSettingsBox();
     _gameMode = settings.get('gameMode', defaultValue: 'local');
 
-    // Add first player
+    // Add first player (Green)
     addPlayer(PlayerModel(
       id: '1',
       name: 'Player 1',
       type: PlayerType.green,
     ));
 
-    // If computer mode, add AI player
+    // If computer mode, add AI player (Red)
     if (_gameMode == 'computer') {
       addPlayer(PlayerModel(
         id: 'ai',
@@ -74,5 +74,9 @@ class LobbyViewModel extends ChangeNotifier {
     ));
 
     NavigationService.navigateTo(AppConstants.gameRoute);
+  }
+
+  bool canAddPlayer() {
+    return _players.length < 2; // Limit to 2 players
   }
 }
