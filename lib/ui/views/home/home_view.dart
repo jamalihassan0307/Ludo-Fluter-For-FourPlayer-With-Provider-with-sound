@@ -6,6 +6,7 @@ import '../../widgets/common/custom_button.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/services/navigation_service.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../ui/views/leaderboard/leaderboard_view.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -77,6 +78,15 @@ class HomeContent extends StatelessWidget {
               text: 'Settings',
               onPressed: viewModel.openSettings,
               color: Colors.grey,
+            ),
+            const SizedBox(height: 16),
+            CustomButton(
+              text: 'Leaderboard',
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LeaderboardView()),
+              ),
+              color: Colors.purple,
             ),
             const Spacer(),
           ],
