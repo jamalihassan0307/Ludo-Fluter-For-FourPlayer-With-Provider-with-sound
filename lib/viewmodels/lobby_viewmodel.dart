@@ -4,7 +4,6 @@ import '../core/constants/app_constants.dart';
 import '../data/models/player_model.dart';
 import '../core/services/storage_service.dart';
 import '../data/models/game_state_model.dart';
-import '../data/models/player_state.dart';
 
 class LobbyViewModel extends ChangeNotifier {
   final List<PlayerModel> _players = [];
@@ -54,7 +53,6 @@ class LobbyViewModel extends ChangeNotifier {
   }
 
   void startGame() {
-    // Save current players to game state
     StorageService.saveGameState(GameStateModel(
       id: DateTime.now().toString(),
       createdAt: DateTime.now(),
@@ -63,11 +61,16 @@ class LobbyViewModel extends ChangeNotifier {
                 id: p.id,
                 name: p.name,
                 type: p.type.toString(),
-                pawnPositions: p.pawns.map((pawn) => pawn.step).toList(),
+                pawnPositions: [], // Initialize empty since game hasn't started
               ))
           .toList(),
       gameMode: _gameMode,
       isCompleted: false,
+      currentState: {
+        'currentTurn': PlayerType.green.toString(),
+        'gameState': 'initial',
+        'diceResult': 0,
+      },
     ));
 
     NavigationService.navigateTo(AppConstants.gameRoute);

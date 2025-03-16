@@ -9,6 +9,7 @@ class PlayerModel {
   final PlayerType type;
   final int position;
   final bool isBot;
+  final List<int> pawns = [0, 0, 0, 0]; // Initialize 4 pawns at position 0
 
   PlayerModel({
     required this.id,
