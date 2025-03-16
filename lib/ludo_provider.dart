@@ -3,7 +3,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:uidesign08/ludo_player.dart';
+import 'package:ludo_flutter/ludo_player.dart';
 import 'package:provider/provider.dart';
 
 import 'audio.dart';
