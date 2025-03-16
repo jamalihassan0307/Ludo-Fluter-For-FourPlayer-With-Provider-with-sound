@@ -19,6 +19,8 @@ import 'viewmodels/auth_viewmodel.dart';
 import 'viewmodels/onboarding_viewmodel.dart';
 import 'viewmodels/lobby_viewmodel.dart';
 import 'ludo_provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'core/services/game_history_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +29,8 @@ void main() async {
   await Firebase.initializeApp();
 
   // Initialize Hive
-  await StorageService.init();
+  await Hive.initFlutter();
+  await GameHistoryService.init();
 
   runApp(
     MultiProvider(

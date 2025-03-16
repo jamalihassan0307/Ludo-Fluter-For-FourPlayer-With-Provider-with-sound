@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../constants.dart';
+import '../../../ludo_provider.dart';
+import '../pawn_widget.dart';
+import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
 
 class GameBoard extends StatelessWidget {

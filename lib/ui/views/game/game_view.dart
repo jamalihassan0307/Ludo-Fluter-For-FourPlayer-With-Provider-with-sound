@@ -106,12 +106,12 @@ class _GameViewContentState extends State<_GameViewContent> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      GameBoard(),
+                      BoardWidget(),
                     ],
                   ),
                   // Dice positions for each player
                   if (value.currentTurn == LudoPlayerType.green)
-                    const Positioned(
+                    Positioned(
                       top: 100,
                       left: 50,
                       child: SizedBox(
@@ -121,7 +121,7 @@ class _GameViewContentState extends State<_GameViewContent> {
                       ),
                     ),
                   if (value.currentTurn == LudoPlayerType.yellow)
-                    const Positioned(
+                    Positioned(
                       top: 100,
                       right: 50,
                       child: SizedBox(
@@ -131,7 +131,7 @@ class _GameViewContentState extends State<_GameViewContent> {
                       ),
                     ),
                   if (value.currentTurn == LudoPlayerType.red)
-                    const Positioned(
+                    Positioned(
                       bottom: 100,
                       left: 50,
                       child: SizedBox(
@@ -141,7 +141,7 @@ class _GameViewContentState extends State<_GameViewContent> {
                       ),
                     ),
                   if (value.currentTurn == LudoPlayerType.blue)
-                    const Positioned(
+                    Positioned(
                       bottom: 100,
                       right: 50,
                       child: SizedBox(
