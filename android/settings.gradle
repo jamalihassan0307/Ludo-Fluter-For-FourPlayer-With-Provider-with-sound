@@ -31,14 +31,3 @@ localPropertiesFile.withReader("UTF-8") { reader -> properties.load(reader) }
 def flutterSdkPath = properties.getProperty("flutter.sdk")
 assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
 apply from: "$flutterSdkPath/packages/flutter_tools/gradle/app_plugin_loader.gradle"
-
-// Configure plugin namespaces
-gradle.projectsEvaluated {
-    plugins.each { name, path ->
-        project(":$name").android.namespace = name == 'path_provider_android' ? 
-            'io.flutter.plugins.pathprovider' : 
-            name == 'just_audio' ? 
-            'com.ryanheise.just_audio' : 
-            "io.flutter.plugins.$name"
-    }
-}
