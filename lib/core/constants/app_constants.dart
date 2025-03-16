@@ -7,7 +7,10 @@ class AppConstants {
   static const String onboardingRoute = '/onboarding';
   static const String loginRoute = '/login';
   static const String homeRoute = '/home';
+  static const String gameModeRoute = '/game-mode';
   static const String gameRoute = '/game';
+  static const String settingsRoute = '/settings';
+  static const String lobbyRoute = '/lobby';
 
   // Asset Paths
   static const String logoPath = "assets/logo.jpg";
