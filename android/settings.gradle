@@ -6,6 +6,8 @@ pluginManagement {
     }
 }
 
+include ':app'
+
 def flutterProjectRoot = rootProject.projectDir.parentFile.toPath()
 
 def plugins = new Properties()
@@ -14,24 +16,10 @@ if (pluginsFile.exists()) {
     pluginsFile.withReader('UTF-8') { reader -> plugins.load(reader) }
 }
 
-// Include the main app project
-include ':app'
-
-// Configure plugins
 plugins.each { name, path ->
     def pluginDirectory = flutterProjectRoot.resolve(path).resolve('android').toFile()
     include ":$name"
     project(":$name").projectDir = pluginDirectory
-    
-    // Create build output directory if it doesn't exist
-    def buildOutputDir = new File(rootProject.projectDir, ".android/plugins_build_output/$name")
-    buildOutputDir.mkdirs()
-    
-    // Copy the plugin's build.gradle file
-    def pluginBuildFile = new File(buildOutputDir, 'build.gradle')
-    if (!pluginBuildFile.exists()) {
-        pluginBuildFile.createNewFile()
-    }
 }
 
 def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
@@ -43,3 +31,14 @@ localPropertiesFile.withReader("UTF-8") { reader -> properties.load(reader) }
 def flutterSdkPath = properties.getProperty("flutter.sdk")
 assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
 apply from: "$flutterSdkPath/packages/flutter_tools/gradle/app_plugin_loader.gradle"
+
+// Configure plugin namespaces
+gradle.projectsEvaluated {
+    plugins.each { name, path ->
+        project(":$name").android.namespace = name == 'path_provider_android' ? 
+            'io.flutter.plugins.pathprovider' : 
+            name == 'just_audio' ? 
+            'com.ryanheise.just_audio' : 
+            "io.flutter.plugins.$name"
+    }
+}
