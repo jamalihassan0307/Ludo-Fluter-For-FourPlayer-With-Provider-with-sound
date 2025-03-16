@@ -14,29 +14,23 @@ if (pluginsFile.exists()) {
     pluginsFile.withReader('UTF-8') { reader -> plugins.load(reader) }
 }
 
+// Include the main app project
 include ':app'
 
+// Configure plugins
 plugins.each { name, path ->
     def pluginDirectory = flutterProjectRoot.resolve(path).resolve('android').toFile()
     include ":$name"
     project(":$name").projectDir = pluginDirectory
     
-    // Add namespace configuration for each plugin
-    project(":$name").buildFileName = 'build.gradle'
+    // Create build output directory if it doesn't exist
+    def buildOutputDir = new File(rootProject.projectDir, ".android/plugins_build_output/$name")
+    buildOutputDir.mkdirs()
     
-    // Configure plugin namespaces
-    if (name == 'path_provider_android') {
-        project(":$name").android {
-            namespace 'io.flutter.plugins.pathprovider'
-        }
-    } else if (name == 'just_audio') {
-        project(":$name").android {
-            namespace 'com.ryanheise.just_audio'
-        }
-    } else {
-        project(":$name").android {
-            namespace "io.flutter.plugins.$name"
-        }
+    // Copy the plugin's build.gradle file
+    def pluginBuildFile = new File(buildOutputDir, 'build.gradle')
+    if (!pluginBuildFile.exists()) {
+        pluginBuildFile.createNewFile()
     }
 }
 

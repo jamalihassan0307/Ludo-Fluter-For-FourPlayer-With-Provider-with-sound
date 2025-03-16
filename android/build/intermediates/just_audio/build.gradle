@@ -11,9 +11,9 @@ if (localPropertiesFile.exists()) {
 }
 
 android {
-    namespace 'io.flutter.plugins.pathprovider'
+    namespace 'com.ryanheise.just_audio'
     compileSdk 34
-    
+
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 34
