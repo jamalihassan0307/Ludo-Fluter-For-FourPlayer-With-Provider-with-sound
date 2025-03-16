@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ludo_flutter/constants.dart';
 import 'package:ludo_flutter/data/models/player_model.dart';
+import 'package:ludo_flutter/ludo_player.dart';
 import 'package:provider/provider.dart';
 import '../../../ludo_provider.dart';
 import '../../../widgets/board_widget.dart';
@@ -118,7 +120,14 @@ class _GameViewContentState extends State<_GameViewContent> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            provider.players.firstWhere((p) => p.type == PlayerType.green).name,
+                            provider.players.isEmpty
+                                ? 'Player 1'
+                                : provider.players
+                                    .firstWhere(
+                                      (p) => p.type == PlayerType.green,
+                                      orElse: () => LudoPlayer(LudoPlayerType.green, name: 'Player 1'),
+                                    )
+                                    .name,
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -157,7 +166,14 @@ class _GameViewContentState extends State<_GameViewContent> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            provider.players.firstWhere((p) => p.type == PlayerType.red).name,
+                            provider.players.isEmpty
+                                ? 'Player 2'
+                                : provider.players
+                                    .firstWhere(
+                                      (p) => p.type == PlayerType.red,
+                                      orElse: () => LudoPlayer(LudoPlayerType.red, name: 'Player 2'),
+                                    )
+                                    .name,
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
