@@ -28,6 +28,44 @@ class AuthRepository {
     return null;
   }
 
+  Future<UserModel> signUpWithEmail(
+    String email, 
+    String password, 
+    String name,
+  ) async {
+    final UserCredential result = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    final user = result.user!;
+    final userData = {
+      'id': user.uid,
+      'name': name,
+      'email': email,
+      'photoUrl': '',
+      'gamesPlayed': 0,
+      'gamesWon': 0,
+    };
+
+    await _firestore.collection('users').doc(user.uid).set(userData);
+    return UserModel.fromJson(userData);
+  }
+
+  Future<UserModel> createUserFromGoogle(User user) async {
+    final userData = {
+      'id': user.uid,
+      'name': user.displayName ?? '',
+      'email': user.email ?? '',
+      'photoUrl': user.photoURL ?? '',
+      'gamesPlayed': 0,
+      'gamesWon': 0,
+    };
+
+    await _firestore.collection('users').doc(user.uid).set(userData);
+    return UserModel.fromJson(userData);
+  }
+
   Future<void> signOut() async {
     await _auth.signOut();
   }

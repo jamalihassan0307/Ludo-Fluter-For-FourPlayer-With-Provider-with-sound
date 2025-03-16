@@ -35,6 +35,9 @@ dependencies:
   just_audio: ^0.9.34
   simple_ripple_animation: ^0.0.9
 
+  # Authentication
+  google_sign_in: ^6.1.6
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
