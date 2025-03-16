@@ -37,27 +37,27 @@ class GameStateModel extends HiveObject {
 
   factory GameStateModel.fromJson(Map<String, dynamic> json) {
     return GameStateModel(
-      id: json['id'],
-      createdAt: DateTime.parse(json['createdAt']),
-      players: (json['players'] as List).map((p) => PlayerState.fromJson(p)).toList(),
-      gameMode: json['gameMode'],
-      isCompleted: json['isCompleted'] ?? false,
+      id: json['id'] as String? ?? DateTime.now().toString(),
+      createdAt: DateTime.parse(json['createdAt'] as String? ?? DateTime.now().toString()),
+      players:
+          (json['players'] as List?)?.map((p) => PlayerState.fromJson(Map<String, dynamic>.from(p as Map))).toList() ??
+              [],
+      gameMode: json['gameMode'] as String? ?? 'local',
+      isCompleted: json['isCompleted'] as bool? ?? false,
       winners: List<String>.from(json['winners'] ?? []),
-      currentState: json['currentState'] ?? {},
+      currentState: Map<String, dynamic>.from(json['currentState'] ?? {}),
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'createdAt': createdAt.toIso8601String(),
-      'players': players.map((p) => p.toJson()).toList(),
-      'gameMode': gameMode,
-      'isCompleted': isCompleted,
-      'winners': winners,
-      'currentState': currentState,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'createdAt': createdAt.toIso8601String(),
+        'players': players.map((p) => p.toJson()).toList(),
+        'gameMode': gameMode,
+        'isCompleted': isCompleted,
+        'winners': winners,
+        'currentState': currentState,
+      };
 }
 
 @HiveType(typeId: 1)
