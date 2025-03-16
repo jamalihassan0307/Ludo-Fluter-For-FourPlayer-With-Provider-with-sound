@@ -1,6 +1,6 @@
-part 'game_state_model.g.dart';
-
 import 'package:hive/hive.dart';
+
+part 'game_state_model.g.dart';
 
 @HiveType(typeId: 0)
 class GameStateModel extends HiveObject {
@@ -104,4 +104,4 @@ class PlayerState {
       'pawnPositions': pawnPositions,
     };
   }
-} 
+}
