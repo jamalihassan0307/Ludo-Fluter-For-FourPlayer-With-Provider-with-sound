@@ -5,14 +5,26 @@ import '../../../viewmodels/auth_viewmodel.dart';
 import '../../widgets/common/custom_button.dart';
 import '../../../core/utils/helpers.dart';
 
-class AuthView extends StatefulWidget {
+class AuthView extends StatelessWidget {
   const AuthView({Key? key}) : super(key: key);
 
   @override
-  State<AuthView> createState() => _AuthViewState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => AuthViewModel(),
+      child: const _AuthViewContent(),
+    );
+  }
 }
 
-class _AuthViewState extends State<AuthView> {
+class _AuthViewContent extends StatefulWidget {
+  const _AuthViewContent();
+
+  @override
+  State<_AuthViewContent> createState() => _AuthViewContentState();
+}
+
+class _AuthViewContentState extends State<_AuthViewContent> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();

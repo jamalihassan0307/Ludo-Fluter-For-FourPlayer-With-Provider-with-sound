@@ -5,13 +5,13 @@ import '../core/services/storage_service.dart';
 
 class GameModeViewModel extends ChangeNotifier {
   void startLocalMultiplayer() {
-    NavigationService.navigateTo(AppConstants.gameRoute);
+    StorageService.getSettingsBox().put('gameMode', 'local');
+    NavigationService.navigateTo(AppConstants.lobbyRoute);
   }
 
   void startComputerGame() {
-    // Set game mode as computer in storage
     StorageService.getSettingsBox().put('gameMode', 'computer');
-    NavigationService.navigateTo(AppConstants.gameRoute);
+    NavigationService.navigateTo(AppConstants.lobbyRoute);
   }
 
   void startOnlineMultiplayer() {
