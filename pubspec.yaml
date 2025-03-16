@@ -14,6 +14,11 @@ dependencies:
   provider: ^6.1.2
   stacked: ^3.4.0
 
+  # Local Storage
+  shared_preferences: ^2.2.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
   # Firebase
   firebase_core: ^2.24.2
   firebase_auth: ^4.15.3
@@ -43,3 +48,4 @@ flutter:
     - assets/images/dice/
     - assets/images/crown/
     - assets/sounds/
+    - assets/logo.jpg

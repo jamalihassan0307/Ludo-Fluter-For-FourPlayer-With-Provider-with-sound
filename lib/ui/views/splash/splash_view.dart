@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../../core/services/navigation_service.dart';
+import '../../../viewmodels/splash_viewmodel.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({Key? key}) : super(key: key);
@@ -9,23 +10,54 @@ class SplashView extends StatefulWidget {
   State<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashViewState extends State<SplashView> {
+class _SplashViewState extends State<SplashView> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+
   @override
   void initState() {
     super.initState();
-    _initialize();
+    _controller = AnimationController(
+      vsync: this,
+      duration: AppConstants.animationDuration,
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+    
+    _controller.forward();
+    
+    // Initialize app and handle navigation
+    context.read<SplashViewModel>().initializeApp();
   }
 
-  Future<void> _initialize() async {
-    await Future.delayed(const Duration(seconds: 2));
-    NavigationService.replaceTo(AppConstants.onboardingRoute);
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
-        child: FlutterLogo(size: 100),
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Logo
+              Image.asset(
+                AppConstants.logoPath,
+                width: 200,
+                height: 200,
+              ),
+              const SizedBox(height: 30),
+              // Loading indicator
+              const CircularProgressIndicator(),
+            ],
+          ),
+        ),
       ),
     );
   }
