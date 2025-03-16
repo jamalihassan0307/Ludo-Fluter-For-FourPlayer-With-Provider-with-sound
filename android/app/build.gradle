@@ -26,7 +26,7 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    namespace "com.ludoapp.app"
+    namespace "com.example.your_app_name"
     compileSdk 34
 
     compileOptions {

@@ -1,0 +1,5 @@
+android {
+    namespace "io.flutter.plugins.pathprovider"
+    
+    // ... rest of configuration ...
+} 
