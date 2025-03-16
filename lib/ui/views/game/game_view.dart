@@ -112,80 +112,80 @@ class _GameViewContentState extends State<_GameViewContent> {
                     const BoardWidget(),
 
                     // Player 1 (Green) - Top
-                    if (provider.currentTurn == PlayerType.green)
-                      Positioned(
-                        top: 20,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              provider.players.firstWhere((p) => p.type == PlayerType.green).name,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green,
-                              ),
+                    Positioned(
+                      top: 20,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            provider.players.firstWhere((p) => p.type == PlayerType.green).name,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: provider.currentTurn == PlayerType.green
+                                  ? Colors.green
+                                  : Colors.green.withOpacity(0.5),
                             ),
-                            const SizedBox(height: 8),
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 4,
-                                  ),
-                                ],
-                              ),
-                              child: const SizedBox(
-                                width: 50,
-                                height: 50,
-                                child: DiceWidget(),
-                              ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 4,
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                            child: const SizedBox(
+                              width: 50,
+                              height: 50,
+                              child: DiceWidget(),
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
 
                     // Player 2 (Red) - Bottom
-                    if (provider.currentTurn == PlayerType.red)
-                      Positioned(
-                        bottom: 20,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              provider.players.firstWhere((p) => p.type == PlayerType.red).name,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.red,
-                              ),
+                    Positioned(
+                      bottom: 20,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            provider.players.firstWhere((p) => p.type == PlayerType.red).name,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: provider.currentTurn == PlayerType.red ? Colors.red : Colors.red.withOpacity(0.5),
                             ),
-                            const SizedBox(height: 8),
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 4,
-                                  ),
-                                ],
-                              ),
-                              child: const SizedBox(
-                                width: 50,
-                                height: 50,
-                                child: DiceWidget(),
-                              ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 4,
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                            child: const SizedBox(
+                              width: 50,
+                              height: 50,
+                              child: DiceWidget(),
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
                   ],
                 ),
               ),
