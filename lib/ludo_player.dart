@@ -19,15 +19,7 @@ class LudoPlayer {
   ///Player color
   late Color color;
 
-  final String id = DateTime.now().toString();
-  final String name;
-  final bool isBot;
-
-  LudoPlayer(
-    this.type, {
-    this.name = 'Player',
-    this.isBot = false,
-  }) {
+  LudoPlayer(this.type) {
     for (int i = 0; i < 4; i++) {
       pawns.add(PawnWidget(
         i,
