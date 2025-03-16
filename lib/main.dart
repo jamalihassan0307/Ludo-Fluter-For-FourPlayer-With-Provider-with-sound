@@ -11,6 +11,8 @@ import 'ui/views/onboarding/onboarding_view.dart';
 import 'viewmodels/splash_viewmodel.dart';
 import 'viewmodels/onboarding_viewmodel.dart';
 import 'ui/views/auth/auth_view.dart';
+import 'ui/views/home/home_view.dart';
+import 'ui/views/game/game_mode_view.dart';
 
 import 'ludo_provider.dart';
 
@@ -49,6 +51,9 @@ class Root extends StatelessWidget {
         AppConstants.splashRoute: (context) => const SplashView(),
         AppConstants.onboardingRoute: (context) => const OnboardingView(),
         AppConstants.loginRoute: (context) => const AuthView(),
+        AppConstants.homeRoute: (context) => const HomeView(),
+        AppConstants.gameModeRoute: (context) => const GameModeView(),
+        AppConstants.gameRoute: (context) => const MainScreen(),
         // Add other routes as we create them
         // AppConstants.homeRoute: (context) => const HomeView(),
         // AppConstants.gameRoute: (context) => const GameView(),
