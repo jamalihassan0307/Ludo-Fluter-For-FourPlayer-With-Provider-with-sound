@@ -5,6 +5,7 @@ import '../core/services/navigation_service.dart';
 import '../core/constants/app_constants.dart';
 import '../data/repositories/auth_repository.dart';
 import '../data/models/user_model.dart';
+import '../core/services/storage_service.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final AuthRepository _authRepository = AuthRepository();
@@ -32,6 +33,14 @@ class AuthViewModel extends ChangeNotifier {
       notifyListeners();
 
       await _authRepository.signInWithEmail(email, password);
+
+      // Save user after successful login
+      await StorageService.saveUser(UserModel(
+        id: 'user_id',
+        name: 'User Name',
+        email: email,
+      ));
+
       NavigationService.replaceTo(AppConstants.homeRoute);
     } catch (e) {
       _error = e.toString();
@@ -72,9 +81,8 @@ class AuthViewModel extends ChangeNotifier {
         idToken: googleAuth.idToken,
       );
 
-      final UserCredential userCredential = 
-          await _auth.signInWithCredential(credential);
-      
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+
       if (userCredential.user != null) {
         await _authRepository.createUserFromGoogle(userCredential.user!);
         NavigationService.replaceTo(AppConstants.homeRoute);
@@ -86,4 +94,4 @@ class AuthViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-} 
+}

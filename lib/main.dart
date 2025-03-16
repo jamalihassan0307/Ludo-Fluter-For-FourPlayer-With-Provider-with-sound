@@ -28,9 +28,8 @@ void main() async {
   // Initialize Firebase
   await Firebase.initializeApp();
 
-  // Initialize Hive
-  await Hive.initFlutter();
-  await GameHistoryService.init();
+  // Initialize Storage
+  await StorageService.init();
 
   runApp(
     MultiProvider(
