@@ -321,7 +321,7 @@ class LudoProvider extends ChangeNotifier {
     _gameState = LudoGameState.moving;
 
     var selectedPlayer = player(type);
-    
+
     // Calculate the actual step to move to
     int actualStep = step;
     if (selectedPlayer.pawns[index].step == -1) {
@@ -339,7 +339,7 @@ class LudoProvider extends ChangeNotifier {
 
     // Check if a kill happened
     bool killed = checkToKill(type, index, actualStep, selectedPlayer.path);
-    
+
     // Check for win
     validateWin(type);
 
@@ -354,7 +354,7 @@ class LudoProvider extends ChangeNotifier {
         currentPlayer.highlightInside();
       }
       currentPlayer.highlightOutside();
-      
+
       // If a kill happened, give an extra turn
       if (killed) {
         _gameState = LudoGameState.throwDice;
@@ -363,7 +363,7 @@ class LudoProvider extends ChangeNotifier {
         notifyListeners();
         return;
       }
-      
+
       // Check if any pawns can move with the remaining dice
       bool canMoveAny = false;
       for (int i = 0; i < currentPlayer.pawns.length; i++) {
@@ -372,7 +372,7 @@ class LudoProvider extends ChangeNotifier {
           break;
         }
       }
-      
+
       if (!canMoveAny) {
         // No pawns can move with remaining dice, end turn
         currentTurnDiceRolls.clear();
@@ -465,10 +465,10 @@ class LudoProvider extends ChangeNotifier {
   void moveWithDiceRoll(LudoPlayerType type, int index, int diceRoll) {
     // Remove the used dice roll from the list before moving
     currentTurnDiceRolls.remove(diceRoll);
-    
+
     // Get the player
     var selectedPlayer = player(type);
-    
+
     // If moving from home, use step 0
     if (selectedPlayer.pawns[index].step == -1) {
       if (diceRoll == 6) {

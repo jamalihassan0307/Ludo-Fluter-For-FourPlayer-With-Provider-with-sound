@@ -71,14 +71,14 @@ class PawnWidget extends StatelessWidget {
                 onTap: () {
                   // Get the provider
                   final provider = Provider.of<LudoProvider>(context, listen: false);
-                  
+
                   if (provider.currentTurnDiceRolls.length == 1) {
                     // Only one dice roll, move directly
                     int diceRoll = provider.currentTurnDiceRolls[0];
-                    
+
                     // Remove the dice roll before moving
                     provider.currentTurnDiceRolls.remove(diceRoll);
-                    
+
                     if (step == -1) {
                       // Move out of home (requires a 6)
                       if (diceRoll == 6) {
