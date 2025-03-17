@@ -108,18 +108,18 @@ class LudoProvider extends ChangeNotifier {
     _stopMoving = false;
 
     // Add players based on number selected
-    players.add(LudoPlayer(LudoPlayerType.green));
+    players.add(LudoPlayer(LudoPlayerType.red));
 
     if (numberOfPlayers >= 2) {
       players.add(LudoPlayer(LudoPlayerType.yellow));
     }
 
     if (numberOfPlayers >= 3) {
-      players.add(LudoPlayer(LudoPlayerType.blue));
+      players.add(LudoPlayer(LudoPlayerType.green));
     }
 
     if (numberOfPlayers == 4) {
-      players.add(LudoPlayer(LudoPlayerType.red));
+      players.add(LudoPlayer(LudoPlayerType.blue));
     }
 
     notifyListeners();
