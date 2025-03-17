@@ -8,6 +8,7 @@ import 'package:ludo_flutter/screens/complete_profile_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ludo_flutter/providers/user_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -80,7 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      // Begin interactive sign in process
       final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
 
       if (gUser == null) {
@@ -92,26 +92,49 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Obtain auth details from request
       final GoogleSignInAuthentication gAuth = await gUser.authentication;
-
-      // Create a new credential for user
       final credential = GoogleAuthProvider.credential(
         accessToken: gAuth.accessToken,
         idToken: gAuth.idToken,
       );
 
       // Sign in with credential
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
 
-      // Navigate to complete profile page
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => CompleteProfileScreen(
-              email: gUser.email,
-              isGoogleSignIn: true,
-            ),
-          ),
-        );
+      if (userCredential.user != null) {
+        // Check if user exists in Firestore
+        final userDoc = await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).get();
+
+        if (userDoc.exists) {
+          // User exists, update login time and set in provider
+          await context.read<UserProvider>().setUser(userCredential.user!.uid);
+          await context.read<UserProvider>().updateUserLastLogin();
+
+          // Save login state
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('isLoggedIn', true);
+          await prefs.setString('userId', userCredential.user!.uid);
+
+          // Navigate to home
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+          }
+        } else {
+          // User doesn't exist, go to complete profile
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CompleteProfileScreen(
+                  email: gUser.email,
+                  isGoogleSignIn: true,
+                ),
+              ),
+            );
+          }
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

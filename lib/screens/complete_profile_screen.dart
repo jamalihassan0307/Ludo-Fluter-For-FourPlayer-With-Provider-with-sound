@@ -3,7 +3,10 @@ import 'package:ludo_flutter/constants.dart';
 import 'package:ludo_flutter/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ludo_flutter/models/user_model.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ludo_flutter/providers/user_provider.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   final String? email;
@@ -55,53 +58,51 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
       try {
         final user = FirebaseAuth.instance.currentUser;
-        if (user != null) {
-          // Update user profile
-          await user.updateDisplayName(_nameController.text);
+        if (user == null) return;
 
-          if (!widget.isGoogleSignIn && _passwordController.text.isNotEmpty) {
-            // Update password for email sign-in users
-            await user.updatePassword(_passwordController.text);
-          }
+        final userData = UserModel(
+          uid: user.uid,
+          name: _nameController.text,
+          email: widget.email ?? user.email ?? '',
+          photoURL: user.photoURL,
+          isGoogleSignIn: widget.isGoogleSignIn,
+          createdAt: DateTime.now(),
+          lastLogin: DateTime.now(),
+          stats: {
+            'gamesPlayed': 0,
+            'gamesWon': 0,
+            'totalScore': 0,
+          },
+          settings: {
+            'soundEnabled': true,
+            'vibrationEnabled': true,
+            'notificationsEnabled': true,
+          },
+          friends: [],
+          activeGames: [],
+          gameHistory: [],
+        );
 
-          // Store additional user data in Firestore
-          await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-            'uid': user.uid,
-            'name': _nameController.text,
-            'email': widget.email ?? user.email,
-            'createdAt': DateTime.now(),
-            'lastLogin': DateTime.now(),
-            'isGoogleSignIn': widget.isGoogleSignIn,
-            'hasCompletedProfile': true,
-            'photoURL': user.photoURL,
-            'stats': {
-              'gamesPlayed': 0,
-              'gamesWon': 0,
-              'totalScore': 0,
-            },
-            'settings': {
-              'soundEnabled': true,
-              'vibrationEnabled': true,
-              'notificationsEnabled': true,
-            },
-            'friends': [],
-            'activeGames': [],
-            'gameHistory': [],
-          });
+        // Store user data in Firestore
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set(userData.toMap());
 
-          // Save user data locally
-          await _saveUserDataLocally(user.uid);
+        // Set user in provider
+        await context.read<UserProvider>().setUser(user.uid);
 
-          // Navigate to home page
-          if (mounted) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const HomePage()),
-            );
-          }
+        // Save login state
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('userId', user.uid);
+
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("An error occurred: $e")),
+          SnackBar(content: Text('Error completing profile: $e')),
         );
       } finally {
         setState(() {

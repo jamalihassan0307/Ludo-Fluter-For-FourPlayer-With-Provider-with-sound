@@ -3,7 +3,10 @@ import 'package:ludo_flutter/constants.dart';
 import 'package:ludo_flutter/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ludo_flutter/models/user_model.dart';
+import 'package:ludo_flutter/providers/user_provider.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -22,98 +25,78 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
-  Future<void> _saveUserDataLocally(String userId) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('userId', userId);
-    await prefs.setBool('isLoggedIn', true);
-    await prefs.setBool('isGoogleSignIn', false);
-    await prefs.setString('userPassword', _passwordController.text);
-    await prefs.setString('userEmail', _emailController.text);
-  }
-
-  Future<void> _signup() async {
+  Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
 
       try {
-        // Create user with email and password
         final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
 
-        final user = userCredential.user;
-        if (user != null) {
-          // Update user profile with name
-          await user.updateDisplayName(_nameController.text);
-
-          // Store user data in Firestore
-          await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-            'uid': user.uid,
-            'name': _nameController.text,
-            'email': _emailController.text.trim(),
-            'createdAt': DateTime.now(),
-            'lastLogin': DateTime.now(),
-            'isGoogleSignIn': false,
-            'hasCompletedProfile': true,
-            'photoURL': null,
-            'stats': {
+        if (userCredential.user != null) {
+          final userData = UserModel(
+            uid: userCredential.user!.uid,
+            name: _nameController.text,
+            email: _emailController.text.trim(),
+            photoURL: null,
+            isGoogleSignIn: false,
+            createdAt: DateTime.now(),
+            lastLogin: DateTime.now(),
+            stats: {
               'gamesPlayed': 0,
               'gamesWon': 0,
               'totalScore': 0,
             },
-            'settings': {
+            settings: {
               'soundEnabled': true,
               'vibrationEnabled': true,
               'notificationsEnabled': true,
             },
-            'friends': [],
-            'activeGames': [],
-            'gameHistory': [],
-          });
+            friends: [],
+            activeGames: [],
+            gameHistory: [],
+          );
 
-          // Save user data locally
-          await _saveUserDataLocally(user.uid);
+          // Store user data in Firestore
+          await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set(userData.toMap());
 
-          // Navigate to home page on successful signup
+          // Set user in provider
+          await context.read<UserProvider>().setUser(userCredential.user!.uid);
+
+          // Save login state
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('isLoggedIn', true);
+          await prefs.setString('userId', userCredential.user!.uid);
+
           if (mounted) {
-            Navigator.of(context).pushReplacement(
+            Navigator.pushReplacement(
+              context,
               MaterialPageRoute(builder: (context) => const HomePage()),
             );
           }
         }
       } on FirebaseAuthException catch (e) {
-        String errorMessage = "Signup failed. Please try again.";
-
+        String errorMessage = "Sign up failed. Please try again.";
         if (e.code == 'weak-password') {
-          errorMessage = "The password provided is too weak.";
+          errorMessage = 'The password provided is too weak.';
         } else if (e.code == 'email-already-in-use') {
-          errorMessage = "An account already exists for this email.";
+          errorMessage = 'An account already exists for that email.';
         }
-
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
+          SnackBar(content: Text(errorMessage)),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("An error occurred: $e"),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
+          SnackBar(content: Text("An error occurred: $e")),
         );
       } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -335,7 +318,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               width: double.infinity,
                               height: 50,
                               child: ElevatedButton(
-                                onPressed: _isLoading ? null : _signup,
+                                onPressed: _isLoading ? null : _signUp,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: LudoColor.red,
                                   shape: RoundedRectangleBorder(
