@@ -27,7 +27,7 @@ class DiceWidget extends StatelessWidget {
                 : Colors.white.withOpacity(0),
             ripplesCount: 3,
             minRadius: 30,
-            repeat: true,
+            // repeat: true,
             child: CupertinoButton(
               onPressed: isActive ? value.throwDice : null,
               padding: const EdgeInsets.only(),

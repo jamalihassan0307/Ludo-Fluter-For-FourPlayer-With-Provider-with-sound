@@ -72,25 +72,8 @@ class PawnWidget extends StatelessWidget {
                   // Get the provider
                   final provider = Provider.of<LudoProvider>(context, listen: false);
 
-                  // Check if there are multiple dice rolls
-                  if (provider.currentTurnDiceRolls.length > 1) {
-                    // Show the dice popup
-                    provider.shouldShowDicePopup = true;
-                  } else if (provider.currentTurnDiceRolls.length == 1) {
-                    // Only one dice roll, move directly
-                    int diceRoll = provider.currentTurnDiceRolls[0];
-
-                    // Move the pawn
-                    if (step == -1) {
-                      // Move out of home (requires a 6)
-                      if (diceRoll == 6) {
-                        provider.moveWithDiceRoll(type, index, diceRoll);
-                      }
-                    } else {
-                      // Move forward
-                      provider.moveWithDiceRoll(type, index, diceRoll);
-                    }
-                  }
+                  // Show the dice popup to select which dice to use
+                  provider.shouldShowDicePopup = true;
                 },
               ),
             ),
