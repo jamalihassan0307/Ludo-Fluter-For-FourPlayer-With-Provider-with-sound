@@ -160,36 +160,39 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  // Add a method to build the dice roll history
+  // Add a method to build the dice history
   Widget _buildDiceHistory(LudoProvider provider) {
     return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(25),
+        color: Colors.white.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(20),
       ),
-      child: Row(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text("Dice History: ", style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(width: 10),
-          // Here you would show the dice history
-          // This requires adding a diceHistory list to the LudoProvider
-          // For now, just showing the current dice
-          Container(
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-              color: provider.currentPlayer.color.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Center(
-              child: Text(
-                "${provider.diceResult}",
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
+          const Text("Current Turn Dice Rolls:", style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: provider.currentTurnDiceRolls.map((roll) {
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: provider.currentPlayer.color.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Center(
+                  child: Image.asset(
+                    "assets/images/dice/$roll.png",
+                    width: 20,
+                    height: 20,
+                  ),
+                ),
+              );
+            }).toList(),
           ),
         ],
       ),
@@ -199,45 +202,172 @@ class _MainScreenState extends State<MainScreen> {
   void _showDicePopup(BuildContext context, LudoProvider provider) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: Text(
-          "Dice Rolls",
-          style: TextStyle(color: provider.currentPlayer.color),
+          provider.consecutiveSixes == 3 
+              ? "Three consecutive sixes! Turn canceled." 
+              : "Your Dice Rolls",
+          style: TextStyle(
+            color: provider.currentPlayer.color,
+            fontWeight: FontWeight.bold
+          ),
+          textAlign: TextAlign.center,
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("You rolled the following dice:"),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            provider.consecutiveSixes == 3
+                ? const Text("Your turn is canceled because you rolled three sixes in a row.")
+                : const Text("Select a dice to move your pawn:"),
+            const SizedBox(height: 15),
+            // Grid of dice images
+            GridView.count(
+              shrinkWrap: true,
+              crossAxisCount: 3,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
               children: provider.currentTurnDiceRolls.map((roll) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 5),
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: provider.currentPlayer.color.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "$roll",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                return InkWell(
+                  onTap: provider.consecutiveSixes == 3 
+                      ? null 
+                      : () {
+                          Navigator.pop(context);
+                          // Show pawn selection dialog
+                          _showPawnSelectionDialog(context, provider, roll);
+                        },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: provider.currentPlayer.color.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: provider.currentPlayer.color,
+                        width: 2,
+                      ),
+                    ),
+                    child: Center(
+                      child: Image.asset(
+                        "assets/images/dice/$roll.png",
+                        width: 40,
+                        height: 40,
                       ),
                     ),
                   ),
                 );
               }).toList(),
             ),
-            const SizedBox(height: 10),
-            Text(
-              provider.currentTurnDiceRolls.contains(6)
-                  ? "You can move a pawn out of home or move an existing pawn"
-                  : "You can move an existing pawn",
-              textAlign: TextAlign.center,
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              if (provider.consecutiveSixes == 3) {
+                // Turn is already being canceled in the provider
+              }
+            },
+            child: Text(
+              provider.consecutiveSixes == 3 ? "OK" : "Cancel",
+              style: TextStyle(color: provider.currentPlayer.color),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPawnSelectionDialog(BuildContext context, LudoProvider provider, int diceRoll) {
+    // Get movable pawns for this dice roll
+    List<int> movablePawnIndices = [];
+    for (int i = 0; i < provider.currentPlayer.pawns.length; i++) {
+      if (provider.currentPlayer.pawns[i].highlight) {
+        // For pawns in home, only allow if dice is 6
+        if (provider.currentPlayer.pawns[i].step == -1) {
+          if (diceRoll == 6) {
+            movablePawnIndices.add(i);
+          }
+        } else {
+          // For pawns on board, check if they can move with this dice roll
+          int newStep = provider.currentPlayer.pawns[i].step + diceRoll;
+          if (newStep < provider.currentPlayer.path.length) {
+            movablePawnIndices.add(i);
+          } else if (newStep == provider.currentPlayer.path.length - 1) {
+            // Exact roll to home
+            movablePawnIndices.add(i);
+          }
+        }
+      }
+    }
+    
+    if (movablePawnIndices.isEmpty) {
+      // No pawns can move with this dice roll
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("No pawns can move with dice roll $diceRoll"),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    
+    if (movablePawnIndices.length == 1) {
+      // Only one pawn can move, move it automatically
+      provider.moveWithDiceRoll(
+        provider.currentPlayer.type, 
+        movablePawnIndices[0], 
+        diceRoll
+      );
+      return;
+    }
+    
+    // Multiple pawns can move, show selection dialog
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          "Select Pawn to Move",
+          style: TextStyle(color: provider.currentPlayer.color),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Which pawn do you want to move $diceRoll steps?"),
+            const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: movablePawnIndices.map((index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                      provider.moveWithDiceRoll(
+                        provider.currentPlayer.type, 
+                        index, 
+                        diceRoll
+                      );
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: provider.currentPlayer.color,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "${index + 1}",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
           ],
         ),
@@ -246,7 +376,7 @@ class _MainScreenState extends State<MainScreen> {
             onPressed: () {
               Navigator.pop(context);
             },
-            child: const Text("OK"),
+            child: const Text("Cancel"),
           ),
         ],
       ),

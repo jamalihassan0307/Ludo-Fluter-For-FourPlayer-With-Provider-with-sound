@@ -19,15 +19,22 @@ class DiceWidget extends StatelessWidget {
         }
         
         try {
-          return RippleAnimation(
-            color: value.gameState == LudoGameState.throwDice ? value.currentPlayer.color : Colors.white.withOpacity(0),
-            ripplesCount: 3,
-            minRadius: 30,
-            repeat: true,
-            child: CupertinoButton(
-              onPressed: value.throwDice,
-              padding: const EdgeInsets.only(),
-              child: value.diceStarted ? Image.asset("assets/images/dice/draw.gif", fit: BoxFit.contain) : Image.asset("assets/images/dice/${value.diceResult}.png", fit: BoxFit.contain),
+          return Opacity(
+            opacity: value.isDiceActive ? 1.0 : 0.5,
+            child: RippleAnimation(
+              color: value.gameState == LudoGameState.throwDice 
+                  ? value.currentPlayer.color 
+                  : Colors.white.withOpacity(0),
+              ripplesCount: 3,
+              minRadius: 30,
+              repeat: true,
+              child: CupertinoButton(
+                onPressed: value.isDiceActive ? value.throwDice : null,
+                padding: const EdgeInsets.only(),
+                child: value.diceStarted 
+                    ? Image.asset("assets/images/dice/draw.gif", fit: BoxFit.contain) 
+                    : Image.asset("assets/images/dice/${value.diceResult}.png", fit: BoxFit.contain),
+              ),
             ),
           );
         } catch (e) {
