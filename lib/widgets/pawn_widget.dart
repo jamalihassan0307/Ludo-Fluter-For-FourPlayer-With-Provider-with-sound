@@ -71,12 +71,111 @@ class PawnWidget extends StatelessWidget {
                 onTap: () {
                   // Get the provider
                   final provider = Provider.of<LudoProvider>(context, listen: false);
-
-                  // Show the dice popup to select which dice to use
-                  provider.shouldShowDicePopup = true;
+                  
+                  if (provider.currentTurnDiceRolls.length == 1) {
+                    // Only one dice roll, move directly
+                    int diceRoll = provider.currentTurnDiceRolls[0];
+                    
+                    // Remove the dice roll before moving
+                    provider.currentTurnDiceRolls.remove(diceRoll);
+                    
+                    if (step == -1) {
+                      // Move out of home (requires a 6)
+                      if (diceRoll == 6) {
+                        provider.move(type, index, 0);
+                      }
+                    } else {
+                      // Move forward
+                      provider.move(type, index, step + diceRoll);
+                    }
+                  } else {
+                    // Multiple dice rolls, show selection dialog
+                    _showDiceSelectionDialog(context, provider);
+                  }
                 },
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  void _showDiceSelectionDialog(BuildContext context, LudoProvider provider) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(
+          "Select Dice to Move",
+          style: TextStyle(color: provider.currentPlayer.color, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Which dice do you want to use for Pawn ${index + 1}?"),
+            const SizedBox(height: 15),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              alignment: WrapAlignment.center,
+              children: provider.currentTurnDiceRolls.map((roll) {
+                // Check if this dice can be used for this pawn
+                bool canUse = true;
+                if (step == -1 && roll != 6) {
+                  canUse = false; // Can't move out of home without a 6
+                }
+
+                return Opacity(
+                  opacity: canUse ? 1.0 : 0.3,
+                  child: InkWell(
+                    onTap: canUse
+                        ? () {
+                            Navigator.pop(context);
+                            if (step == -1) {
+                              provider.move(type, index, 0);
+                            } else {
+                              provider.move(type, index, step + roll);
+                            }
+                            // Remove the used dice roll
+                            provider.currentTurnDiceRolls.remove(roll);
+                          }
+                        : null,
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: provider.currentPlayer.color.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: provider.currentPlayer.color,
+                          width: 2,
+                        ),
+                      ),
+                      child: Center(
+                        child: Image.asset(
+                          "assets/images/dice/$roll.png",
+                          width: 30,
+                          height: 30,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: provider.currentPlayer.color),
+            ),
+          ),
         ],
       ),
     );

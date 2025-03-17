@@ -25,9 +25,9 @@ class DiceWidget extends StatelessWidget {
             color: (isActive && value.gameState == LudoGameState.throwDice)
                 ? value.currentPlayer.color
                 : Colors.white.withOpacity(0),
-            ripplesCount: 3,
+            ripplesCount: 1,
             minRadius: 30,
-            // repeat: true,
+            repeat: true,
             child: CupertinoButton(
               onPressed: isActive ? value.throwDice : null,
               padding: const EdgeInsets.only(),
