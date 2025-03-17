@@ -130,13 +130,16 @@ class LudoProvider extends ChangeNotifier {
   // Track dice rolls in current turn
   List<int> currentTurnDiceRolls = [];
   bool shouldShowDicePopup = false;
-
+  
   // Track consecutive sixes
   int _consecutiveSixes = 0;
-
+  
   // Add dice history list
   final List<int> diceHistory = [];
-
+  
+  // Flag to indicate if dice is active for current player
+  bool get isDiceActive => _gameState == LudoGameState.throwDice;
+  
   // Points tracking
   Map<LudoPlayerType, int> playerPoints = {
     LudoPlayerType.red: 0,
@@ -150,7 +153,7 @@ class LudoProvider extends ChangeNotifier {
     if (_gameState != LudoGameState.throwDice) return;
     _diceStarted = true;
     notifyListeners();
-    Audio.rollDice();
+    await Audio.rollDice();
 
     // Check if already win skip
     if (winners.contains(currentPlayer.type)) {
@@ -161,93 +164,86 @@ class LudoProvider extends ChangeNotifier {
     // Turn off highlight for all pawns
     currentPlayer.highlightAllPawns(false);
 
-    Future.delayed(const Duration(seconds: 1)).then((value) {
-      _diceStarted = false;
-      var random = Random();
-      _diceResult = random.nextInt(6) + 1; // Random between 1-6
+    await Future.delayed(const Duration(seconds: 1));
+    _diceStarted = false;
+    var random = Random();
+    _diceResult = random.nextInt(6) + 1; // Random between 1-6
+    
+    // Add to dice history
+    diceHistory.add(_diceResult);
+    if (diceHistory.length > 10) {
+      diceHistory.removeAt(0); // Keep only the last 10 rolls
+    }
+    
+    // Add to current turn rolls
+    currentTurnDiceRolls.add(_diceResult);
+    
+    notifyListeners();
 
-      // Add to dice history
-      diceHistory.add(_diceResult);
-      if (diceHistory.length > 10) {
-        diceHistory.removeAt(0); // Keep only the last 10 rolls
-      }
-
-      // Add to current turn rolls
-      currentTurnDiceRolls.add(_diceResult);
-
-      notifyListeners();
-
-      if (diceResult == 6) {
-        _consecutiveSixes++;
-
-        // Check for three consecutive sixes
-        if (_consecutiveSixes == 3) {
-          // Reset consecutive sixes counter
-          _consecutiveSixes = 0;
-
-          // Show message about losing turn due to 3 consecutive sixes
-          _showThreeSixesMessage();
-
-          // Clear current turn rolls
-          currentTurnDiceRolls.clear();
-
-          // Move to next player's turn
-          nextTurn();
-          return;
-        }
-
-        // For a 6, roll again immediately
-        _gameState = LudoGameState.throwDice;
-        notifyListeners();
-      } else {
-        // Reset consecutive sixes counter for non-6 roll
+    if (diceResult == 6) {
+      _consecutiveSixes++;
+      
+      // Check for three consecutive sixes
+      if (_consecutiveSixes == 3) {
+        // Reset consecutive sixes counter
         _consecutiveSixes = 0;
-
-        // Set flag to show dice popup with all rolls
-        shouldShowDicePopup = currentTurnDiceRolls.length > 1;
-
-        // Check if all pawns are in home
-        if (currentPlayer.pawns.every((p) => p.step == currentPlayer.path.length - 1)) {
-          // All pawns are in home, automatically move to next player
-          currentTurnDiceRolls.clear();
-          return nextTurn();
-        }
-
-        // All pawns are inside starting area and no 6 was rolled
-        if (currentPlayer.pawnInsideCount == 4 && !currentTurnDiceRolls.contains(6)) {
-          // Clear current turn rolls
-          currentTurnDiceRolls.clear();
-          return nextTurn();
-        } else {
-          // Highlight pawns that can move
-          if (currentTurnDiceRolls.contains(6)) {
-            // If we rolled a 6 at any point, highlight pawns inside home
-            currentPlayer.highlightInside();
-          }
-
-          // Also highlight pawns outside home
-          currentPlayer.highlightOutside();
-
-          // Check if only one pawn can move, then move it automatically
-          List<int> movablePawnIndices = [];
-          for (int i = 0; i < currentPlayer.pawns.length; i++) {
-            if (currentPlayer.pawns[i].highlight) {
-              movablePawnIndices.add(i);
-            }
-          }
-
-          if (movablePawnIndices.length == 1) {
-            // Only one pawn can move, move it automatically
-            int index = movablePawnIndices[0];
-            move(currentPlayer.type, index, 0); // The actual step will be calculated in move()
-            return;
-          }
-
-          _gameState = LudoGameState.pickPawn;
-          notifyListeners();
-        }
+        
+        // Play sound for canceled turn
+        await Audio.playKill();
+        
+        // Show message about losing turn due to 3 consecutive sixes
+        shouldShowDicePopup = true;
+        
+        // Clear current turn rolls
+        currentTurnDiceRolls.clear();
+        
+        // Move to next player's turn after a delay
+        await Future.delayed(const Duration(seconds: 1));
+        nextTurn();
+        return;
       }
-    });
+      
+      // For a 6, roll again after a short delay
+      await Future.delayed(const Duration(milliseconds: 500));
+      _gameState = LudoGameState.throwDice;
+      notifyListeners();
+    } else {
+      // Reset consecutive sixes counter for non-6 roll
+      _consecutiveSixes = 0;
+      
+      // Show dice popup with all rolls
+      if (currentTurnDiceRolls.length > 1) {
+        shouldShowDicePopup = true;
+      }
+      
+      // Check if all pawns are in home
+      if (currentPlayer.pawns.every((p) => p.step == currentPlayer.path.length - 1)) {
+        // All pawns are in home, automatically move to next player
+        currentTurnDiceRolls.clear();
+        await Future.delayed(const Duration(milliseconds: 500));
+        return nextTurn();
+      }
+      
+      // All pawns are inside starting area and no 6 was rolled
+      if (currentPlayer.pawnInsideCount == 4 && !currentTurnDiceRolls.contains(6)) {
+        // Clear current turn rolls
+        currentTurnDiceRolls.clear();
+        await Future.delayed(const Duration(milliseconds: 500));
+        return nextTurn();
+      } else {
+        // Highlight pawns that can move
+        if (currentTurnDiceRolls.contains(6)) {
+          // If we rolled a 6 at any point, highlight pawns inside home
+          currentPlayer.highlightInside();
+        }
+        
+        // Also highlight pawns outside home
+        currentPlayer.highlightOutside();
+        
+        _gameState = LudoGameState.pickPawn;
+        notifyListeners();
+      }
+    }
   }
 
   ///Move pawn to next step and check if it can kill other pawn
@@ -386,5 +382,80 @@ class LudoProvider extends ChangeNotifier {
   void _showThreeSixesMessage() {
     // This would be implemented to show a message to the user
     print("Three consecutive sixes! Turn canceled.");
+  }
+
+  // Method to move pawn with specific dice roll
+  void moveWithDiceRoll(LudoPlayerType type, int index, int diceRoll) async {
+    if (_isMoving) return;
+    _isMoving = true;
+    _gameState = LudoGameState.moving;
+
+    currentPlayer.highlightAllPawns(false);
+    var selectedPlayer = player(type);
+    
+    // Remove the used dice roll from the list
+    currentTurnDiceRolls.remove(diceRoll);
+    
+    // If moving from home, use 1 step (requires a 6)
+    int moveSteps = selectedPlayer.pawns[index].step == -1 ? 1 : diceRoll;
+    
+    // Calculate the new step position
+    int newStep = selectedPlayer.pawns[index].step == -1 ? 0 : selectedPlayer.pawns[index].step + moveSteps;
+    
+    // Check if this would exceed the home position
+    if (newStep >= selectedPlayer.path.length) {
+      // Can't move beyond home, need exact roll
+      int stepsToHome = selectedPlayer.path.length - 1 - selectedPlayer.pawns[index].step;
+      if (diceRoll != stepsToHome) {
+        // Can't move this pawn, cancel move
+        _isMoving = false;
+        _gameState = LudoGameState.pickPawn;
+        notifyListeners();
+        return;
+      }
+      // Set to exact home position
+      newStep = selectedPlayer.path.length - 1;
+    }
+    
+    // Move the pawn
+    for (int i = selectedPlayer.pawns[index].step + 1; i <= newStep; i++) {
+      if (_stopMoving) break;
+      selectedPlayer.movePawn(index, i);
+      notifyListeners();
+      await Future.delayed(const Duration(milliseconds: 200));
+    }
+
+    // If a kill happened, give an extra turn
+    if (checkToKill(type, index, newStep, selectedPlayer.path)) {
+      _gameState = LudoGameState.throwDice;
+      _isMoving = false;
+      await Audio.playKill();
+      notifyListeners();
+      return;
+    }
+
+    validateWin(type);
+
+    // Check if there are more dice rolls to use
+    if (currentTurnDiceRolls.isNotEmpty) {
+      // Still have dice rolls to use
+      _gameState = LudoGameState.pickPawn;
+      
+      // Highlight pawns that can move with remaining dice
+      currentPlayer.highlightAllPawns(false);
+      if (currentTurnDiceRolls.contains(6)) {
+        currentPlayer.highlightInside();
+      }
+      currentPlayer.highlightOutside();
+      
+      // Show popup with remaining dice
+      shouldShowDicePopup = true;
+    } else {
+      // No more dice rolls, end turn
+      nextTurn();
+    }
+    
+    _isMoving = false;
+    notifyListeners();
   }
 }
