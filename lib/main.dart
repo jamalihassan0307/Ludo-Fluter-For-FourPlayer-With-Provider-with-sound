@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:ludo_flutter/screens/login_screen.dart';
+import 'package:ludo_flutter/screens/walkthrough_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:ludo_flutter/main_screen.dart';
 import 'package:ludo_flutter/home_page.dart';
@@ -7,6 +9,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ludo_flutter/ludo_provider.dart';
 import 'package:ludo_flutter/screens/splash_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'ludo_provider.dart';
 
@@ -30,6 +33,38 @@ class MyApp extends StatelessWidget {
               primarySwatch: Colors.blue,
               fontFamily: 'Poppins',
             ),
-            home: SplashScreen()));
+            home: StreamBuilder<User?>(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                return FutureBuilder<bool>(
+                  future: _checkFirstLaunch(),
+                  builder: (context, prefSnapshot) {
+                    if (prefSnapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    final isFirstLaunch = prefSnapshot.data ?? true;
+
+                    if (isFirstLaunch) {
+                      return const WalkthroughScreen();
+                    }
+
+                    if (snapshot.hasData) {
+                      return const HomePage();
+                    }
+                    return const LoginScreen();
+                  },
+                );
+              },
+            )));
+  }
+
+  Future<bool> _checkFirstLaunch() async {
+    final prefs = await SharedPreferences.getInstance();
+    return !(prefs.getBool('walkthroughCompleted') ?? false);
   }
 }

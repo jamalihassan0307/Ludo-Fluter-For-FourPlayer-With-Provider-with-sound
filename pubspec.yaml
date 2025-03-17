@@ -38,6 +38,15 @@ dependencies:
   # Authentication
   google_sign_in: ^6.1.6
 
+  # Add these new dependencies
+  smooth_page_indicator: ^1.1.0
+  lottie: ^2.7.0
+  animated_text_kit: ^4.2.2
+  flutter_svg: ^2.0.9
+  rive: ^0.12.3
+  flutter_animate: ^4.3.0
+  liquid_swipe: ^3.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
