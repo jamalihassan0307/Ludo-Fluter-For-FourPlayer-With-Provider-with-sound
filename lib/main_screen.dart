@@ -36,7 +36,7 @@ class _MainScreenState extends State<MainScreen> {
           value.shouldShowDicePopup = false;
         });
       }
-      
+
       return Scaffold(
         body: Center(
           child: Stack(
@@ -49,48 +49,32 @@ class _MainScreenState extends State<MainScreen> {
                   BoardWidget(),
                 ],
               ),
-              
+
               // Display dice based on current turn
               if (value.currentTurn == LudoPlayerType.green)
-                Positioned(
-                  top: 100, 
-                  left: 50, 
-                  child: SizedBox(width: 50, height: 50, child: DiceWidget())
-                ),
-                
+                Positioned(top: 100, left: 50, child: SizedBox(width: 50, height: 50, child: DiceWidget())),
+
               if (value.currentTurn == LudoPlayerType.yellow)
-                Positioned(
-                  top: 100, 
-                  right: 50, 
-                  child: SizedBox(width: 50, height: 50, child: DiceWidget())
-                ),
-                
+                Positioned(top: 100, right: 50, child: SizedBox(width: 50, height: 50, child: DiceWidget())),
+
               if (value.currentTurn == LudoPlayerType.red)
-                Positioned(
-                  bottom: 100, 
-                  left: 50, 
-                  child: SizedBox(width: 50, height: 50, child: DiceWidget())
-                ),
-                
+                Positioned(bottom: 100, left: 50, child: SizedBox(width: 50, height: 50, child: DiceWidget())),
+
               if (value.currentTurn == LudoPlayerType.blue)
-                Positioned(
-                  bottom: 100, 
-                  right: 50, 
-                  child: SizedBox(width: 50, height: 50, child: DiceWidget())
-                ),
-              
+                Positioned(bottom: 100, right: 50, child: SizedBox(width: 50, height: 50, child: DiceWidget())),
+
               // Show player points
               Positioned(
                 top: 20,
                 child: _buildPointsDisplay(value),
               ),
-              
+
               // Show dice roll history at the bottom
               Positioned(
                 bottom: 20,
                 child: _buildDiceHistory(value),
               ),
-              
+
               // Game over screen
               Consumer<LudoProvider>(
                 builder: (context, value, child) => value.winners.length == (widget.numberOfPlayers - 1)
@@ -205,13 +189,8 @@ class _MainScreenState extends State<MainScreen> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: Text(
-          provider.consecutiveSixes == 3 
-              ? "Three consecutive sixes! Turn canceled." 
-              : "Your Dice Rolls",
-          style: TextStyle(
-            color: provider.currentPlayer.color,
-            fontWeight: FontWeight.bold
-          ),
+          provider.consecutiveSixes == 3 ? "Three consecutive sixes! Turn canceled." : "Your Dice Rolls",
+          style: TextStyle(color: provider.currentPlayer.color, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         content: Column(
@@ -229,8 +208,8 @@ class _MainScreenState extends State<MainScreen> {
               crossAxisSpacing: 10,
               children: provider.currentTurnDiceRolls.map((roll) {
                 return InkWell(
-                  onTap: provider.consecutiveSixes == 3 
-                      ? null 
+                  onTap: provider.consecutiveSixes == 3
+                      ? null
                       : () {
                           Navigator.pop(context);
                           // Show pawn selection dialog
@@ -298,7 +277,7 @@ class _MainScreenState extends State<MainScreen> {
         }
       }
     }
-    
+
     if (movablePawnIndices.isEmpty) {
       // No pawns can move with this dice roll
       ScaffoldMessenger.of(context).showSnackBar(
@@ -309,17 +288,13 @@ class _MainScreenState extends State<MainScreen> {
       );
       return;
     }
-    
+
     if (movablePawnIndices.length == 1) {
       // Only one pawn can move, move it automatically
-      provider.moveWithDiceRoll(
-        provider.currentPlayer.type, 
-        movablePawnIndices[0], 
-        diceRoll
-      );
+      provider.moveWithDiceRoll(provider.currentPlayer.type, movablePawnIndices[0], diceRoll);
       return;
     }
-    
+
     // Multiple pawns can move, show selection dialog
     showDialog(
       context: context,
@@ -341,11 +316,7 @@ class _MainScreenState extends State<MainScreen> {
                   child: InkWell(
                     onTap: () {
                       Navigator.pop(context);
-                      provider.moveWithDiceRoll(
-                        provider.currentPlayer.type, 
-                        index, 
-                        diceRoll
-                      );
+                      provider.moveWithDiceRoll(provider.currentPlayer.type, index, diceRoll);
                     },
                     child: Container(
                       width: 40,
