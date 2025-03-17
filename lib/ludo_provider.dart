@@ -167,7 +167,7 @@ class LudoProvider extends ChangeNotifier {
     // Turn off highlight for all pawns
     currentPlayer.highlightAllPawns(false);
 
-    await Future.delayed(const Duration(seconds: 1));
+    // await Future.delayed(const Duration(seconds: 1));
     _diceStarted = false;
     var random = Random();
     _diceResult = random.nextInt(6) + 1; // Random between 1-6

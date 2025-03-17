@@ -50,18 +50,50 @@ class _MainScreenState extends State<MainScreen> {
                 ],
               ),
 
-              // Display dice based on current turn
-              if (value.currentTurn == LudoPlayerType.green)
-                Positioned(top: 100, left: 50, child: SizedBox(width: 50, height: 50, child: DiceWidget())),
+              // Display dice based on current turn with blurred versions for inactive positions
+              Positioned(
+                  top: 100,
+                  left: 50,
+                  child: SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: Opacity(
+                        opacity: value.currentTurn == LudoPlayerType.green ? 1.0 : 0.3,
+                        child: DiceWidget(isActive: value.currentTurn == LudoPlayerType.green),
+                      ))),
 
-              if (value.currentTurn == LudoPlayerType.yellow)
-                Positioned(top: 100, right: 50, child: SizedBox(width: 50, height: 50, child: DiceWidget())),
+              Positioned(
+                  top: 100,
+                  right: 50,
+                  child: SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: Opacity(
+                        opacity: value.currentTurn == LudoPlayerType.yellow ? 1.0 : 0.3,
+                        child: DiceWidget(isActive: value.currentTurn == LudoPlayerType.yellow),
+                      ))),
 
-              if (value.currentTurn == LudoPlayerType.red)
-                Positioned(bottom: 100, left: 50, child: SizedBox(width: 50, height: 50, child: DiceWidget())),
+              Positioned(
+                  bottom: 100,
+                  left: 50,
+                  child: SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: Opacity(
+                        opacity: value.currentTurn == LudoPlayerType.red ? 1.0 : 0.3,
+                        child: DiceWidget(isActive: value.currentTurn == LudoPlayerType.red),
+                      ))),
 
-              if (value.currentTurn == LudoPlayerType.blue)
-                Positioned(bottom: 100, right: 50, child: SizedBox(width: 50, height: 50, child: DiceWidget())),
+              Positioned(
+                  bottom: 100,
+                  right: 50,
+                  child: SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: Opacity(
+                        opacity: value.currentTurn == LudoPlayerType.blue ? 1.0 : 0.3,
+                        child: DiceWidget(isActive: value.currentTurn == LudoPlayerType.blue),
+                      ))),
 
               // Show player points
               Positioned(
@@ -200,12 +232,11 @@ class _MainScreenState extends State<MainScreen> {
                 ? const Text("Your turn is canceled because you rolled three sixes in a row.")
                 : const Text("Select a dice to move your pawn:"),
             const SizedBox(height: 15),
-            // Grid of dice images
-            GridView.count(
-              shrinkWrap: true,
-              crossAxisCount: 3,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
+            // Replace GridView with Wrap
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              alignment: WrapAlignment.center,
               children: provider.currentTurnDiceRolls.map((roll) {
                 return InkWell(
                   onTap: provider.consecutiveSixes == 3
@@ -216,6 +247,8 @@ class _MainScreenState extends State<MainScreen> {
                           _showPawnSelectionDialog(context, provider, roll);
                         },
                   child: Container(
+                    width: 60,
+                    height: 60,
                     decoration: BoxDecoration(
                       color: provider.currentPlayer.color.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
