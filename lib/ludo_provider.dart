@@ -41,8 +41,19 @@ class LudoProvider extends ChangeNotifier {
   bool _diceStarted = false;
   bool get diceStarted => _diceStarted;
 
-  LudoPlayer get currentPlayer =>
-      players.firstWhere((element) => element.type == currentTurn);
+  LudoPlayer get currentPlayer {
+    if (players.isEmpty) {
+      // Initialize players if empty
+      startGame();
+    }
+
+    try {
+      return players.firstWhere((element) => element.type == currentTurn);
+    } catch (e) {
+      // If current turn player not found, return first player
+      return players.first;
+    }
+  }
 
   ///Fill all players
   final List<LudoPlayer> players = [];
@@ -50,73 +61,68 @@ class LudoProvider extends ChangeNotifier {
   ///Player win, we use `LudoPlayerType` to make it easier to check
   final List<LudoPlayerType> winners = [];
 
-  LudoPlayer player(LudoPlayerType type) =>
-      players.firstWhere((element) => element.type == type);
+  LudoPlayer player(LudoPlayerType type) {
+    try {
+      return players.firstWhere((element) => element.type == type);
+    } catch (e) {
+      // If player not found, return green player as default
+      return players.first;
+    }
+  }
 
   ///This method will check if the pawn can kill another pawn or not by checking the step of the pawn
-  bool checkToKill(
-      LudoPlayerType type, int index, int step, List<List<double>> path) {
+  bool checkToKill(LudoPlayerType type, int index, int step, List<List<double>> path) {
     bool killSomeone = false;
-    for (int i = 0; i < 4; i++) {
-      var greenElement = player(LudoPlayerType.green).pawns[i];
-      var blueElement = player(LudoPlayerType.blue).pawns[i];
-      var redElement = player(LudoPlayerType.red).pawns[i];
-      var yellowElement = player(LudoPlayerType.yellow).pawns[i];
 
-      if ((greenElement.step > -1 &&
-              !LudoPath.safeArea.map((e) => e.toString()).contains(
-                  player(LudoPlayerType.green)
-                      .path[greenElement.step]
-                      .toString())) &&
-          type != LudoPlayerType.green) {
-        if (player(LudoPlayerType.green).path[greenElement.step].toString() ==
-            path[step - 1].toString()) {
-          killSomeone = true;
-          player(LudoPlayerType.green).movePawn(i, -1);
-          notifyListeners();
-        }
-      }
-      if ((yellowElement.step > -1 &&
-              !LudoPath.safeArea.map((e) => e.toString()).contains(
-                  player(LudoPlayerType.yellow)
-                      .path[yellowElement.step]
-                      .toString())) &&
-          type != LudoPlayerType.yellow) {
-        if (player(LudoPlayerType.yellow).path[yellowElement.step].toString() ==
-            path[step - 1].toString()) {
-          killSomeone = true;
-          player(LudoPlayerType.yellow).movePawn(i, -1);
-          notifyListeners();
-        }
-      }
-      if ((blueElement.step > -1 &&
-              !LudoPath.safeArea.map((e) => e.toString()).contains(
-                  player(LudoPlayerType.blue)
-                      .path[blueElement.step]
-                      .toString())) &&
-          type != LudoPlayerType.blue) {
-        if (player(LudoPlayerType.blue).path[blueElement.step].toString() ==
-            path[step - 1].toString()) {
-          killSomeone = true;
-          player(LudoPlayerType.blue).movePawn(i, -1);
-          notifyListeners();
-        }
-      }
-      if ((redElement.step > -1 &&
-              !LudoPath.safeArea.map((e) => e.toString()).contains(
-                  player(LudoPlayerType.red)
-                      .path[redElement.step]
-                      .toString())) &&
-          type != LudoPlayerType.red) {
-        if (player(LudoPlayerType.red).path[redElement.step].toString() ==
-            path[step - 1].toString()) {
-          killSomeone = true;
-          player(LudoPlayerType.red).movePawn(i, -1);
-          notifyListeners();
+    // Only check for players that are actually in the game
+    for (var player in players) {
+      if (player.type != type) {
+        // Don't check current player's pawns
+        for (int i = 0; i < player.pawns.length; i++) {
+          var pawn = player.pawns[i];
+          if (pawn.step > -1 &&
+              !LudoPath.safeArea.map((e) => e.toString()).contains(player.path[pawn.step].toString())) {
+            if (player.path[pawn.step].toString() == path[step - 1].toString()) {
+              killSomeone = true;
+              player.movePawn(i, -1);
+              notifyListeners();
+            }
+          }
         }
       }
     }
     return killSomeone;
+  }
+
+  int _numberOfPlayers = 4;
+
+  void startGame({int numberOfPlayers = 4}) {
+    _numberOfPlayers = numberOfPlayers;
+    winners.clear();
+    players.clear();
+    currentTurn = LudoPlayerType.green; // Reset to first player
+    _gameState = LudoGameState.throwDice;
+    _diceResult = 0;
+    _consecutiveSixes = 0;
+    _isMoving = false;
+    _stopMoving = false;
+
+    // Add players based on number selected
+    players.add(LudoPlayer(LudoPlayerType.green));
+
+    if (numberOfPlayers >= 2) {
+      players.add(LudoPlayer(LudoPlayerType.yellow));
+    }
+
+    if (numberOfPlayers >= 3) {
+      players.add(LudoPlayer(LudoPlayerType.blue));
+    }
+
+    if (numberOfPlayers == 4) {
+      players.add(LudoPlayer(LudoPlayerType.red));
+    }
+
+    notifyListeners();
   }
 
   ///This is the function that will be called to throw the dice
@@ -138,11 +144,19 @@ class LudoProvider extends ChangeNotifier {
     Future.delayed(const Duration(seconds: 1)).then((value) {
       _diceStarted = false;
       var random = Random();
-      _diceResult =
-          random.nextBool() ? 6 : random.nextInt(6) + 1; //Random between 1 - 6
+      _diceResult = random.nextBool() ? 6 : random.nextInt(6) + 1; //Random between 1 - 6
       notifyListeners();
 
       if (diceResult == 6) {
+        _consecutiveSixes++;
+
+        // Check for three consecutive sixes
+        if (_consecutiveSixes == 3) {
+          _consecutiveSixes = 0;
+          nextTurn();
+          return;
+        }
+
         currentPlayer.highlightAllPawns();
         _gameState = LudoGameState.pickPawn;
         notifyListeners();
@@ -161,8 +175,14 @@ class LudoProvider extends ChangeNotifier {
       ///Check and disable if any pawn already in the finish box
       for (var i = 0; i < currentPlayer.pawns.length; i++) {
         var pawn = currentPlayer.pawns[i];
-        if ((pawn.step + diceResult) > currentPlayer.path.length - 1) {
-          currentPlayer.highlightPawn(i, false);
+
+        // Check if pawn needs exact roll to enter home
+        if (pawn.step > -1) {
+          int stepsToHome = currentPlayer.path.length - 1 - pawn.step;
+          if (stepsToHome < diceResult) {
+            // Can't move this pawn as it needs exact roll
+            currentPlayer.highlightPawn(i, false);
+          }
         }
       }
 
@@ -194,12 +214,9 @@ class LudoProvider extends ChangeNotifier {
         }
       }
 
-      if (currentPlayer.pawns.where((element) => element.highlight).length ==
-          1) {
-        var index =
-            currentPlayer.pawns.indexWhere((element) => element.highlight);
-        move(currentPlayer.type, index,
-            (currentPlayer.pawns[index].step + 1) + diceResult);
+      if (currentPlayer.pawns.where((element) => element.highlight).length == 1) {
+        var index = currentPlayer.pawns.indexWhere((element) => element.highlight);
+        move(currentPlayer.type, index, (currentPlayer.pawns[index].step + 1) + diceResult);
       }
     });
   }
@@ -212,8 +229,22 @@ class LudoProvider extends ChangeNotifier {
 
     currentPlayer.highlightAllPawns(false);
 
-    // int delay = 500;
     var selectedPlayer = player(type);
+
+    // Check if path is blocked by blockades only for active players
+    for (int i = selectedPlayer.pawns[index].step + 1; i < step; i++) {
+      for (var otherPlayer in players) {
+        if (otherPlayer.type != type && isBlockade(selectedPlayer.path[i], otherPlayer.type)) {
+          // Path is blocked, cancel move
+          _isMoving = false;
+          _gameState = LudoGameState.throwDice;
+          nextTurn();
+          return;
+        }
+      }
+    }
+
+    // int delay = 500;
     for (int i = selectedPlayer.pawns[index].step; i < step; i++) {
       if (_stopMoving) break;
       if (selectedPlayer.pawns[index].step == i) continue;
@@ -244,20 +275,10 @@ class LudoProvider extends ChangeNotifier {
 
   ///Next turn will be called when the player finish the turn
   void nextTurn() {
-    switch (currentTurn) {
-      case LudoPlayerType.green:
-        currentTurn = LudoPlayerType.yellow;
-        break;
-      case LudoPlayerType.yellow:
-        currentTurn = LudoPlayerType.blue;
-        break;
-      case LudoPlayerType.blue:
-        currentTurn = LudoPlayerType.red;
-        break;
-      case LudoPlayerType.red:
-        currentTurn = LudoPlayerType.green;
-        break;
-    }
+    int currentIndex = players.indexWhere((p) => p.type == currentTurn);
+    if (currentIndex == -1) currentIndex = 0; // Fallback to first player if not found
+    currentIndex = (currentIndex + 1) % players.length; // Use players.length instead of _numberOfPlayers
+    currentTurn = players[currentIndex].type;
 
     if (winners.contains(currentTurn)) return nextTurn();
     _gameState = LudoGameState.throwDice;
@@ -267,28 +288,33 @@ class LudoProvider extends ChangeNotifier {
   ///This function will check if the pawn finish the game or not
   void validateWin(LudoPlayerType color) {
     if (winners.map((e) => e.name).contains(color.name)) return;
-    if (player(color)
-        .pawns
-        .map((e) => e.step)
-        .every((element) => element == player(color).path.length - 1)) {
+
+    // Check if all pawns are exactly in the home position
+    if (player(color).pawns.map((e) => e.step).every((element) => element == player(color).path.length - 1)) {
       winners.add(color);
       notifyListeners();
     }
 
-    if (winners.length == 3) {
+    // Adjust win condition based on number of players
+    if (winners.length == _numberOfPlayers - 1) {
       _gameState = LudoGameState.finish;
     }
   }
 
-  void startGame() {
-    winners.clear();
-    players.clear();
-    players.addAll([
-      LudoPlayer(LudoPlayerType.green),
-      LudoPlayer(LudoPlayerType.yellow),
-      LudoPlayer(LudoPlayerType.blue),
-      LudoPlayer(LudoPlayerType.red),
-    ]);
+  // Add rule for three consecutive sixes
+  int _consecutiveSixes = 0;
+
+  // Modify isBlockade to only check active players
+  bool isBlockade(List<double> position, LudoPlayerType type) {
+    try {
+      var currentPlayer = player(type);
+      int pawnsAtPosition = currentPlayer.pawns
+          .where((p) => p.step > -1 && currentPlayer.path[p.step].toString() == position.toString())
+          .length;
+      return pawnsAtPosition >= 2;
+    } catch (e) {
+      return false;
+    }
   }
 
   @override

@@ -20,4 +20,10 @@ class Audio {
     audioPlayer.play();
     return Future.delayed(duration ?? Duration.zero);
   }
+
+  static Future<void> playBlockade() async {
+    var duration = await audioPlayer.setAsset('assets/sounds/blocked.wav');
+    audioPlayer.play();
+    return Future.delayed(duration ?? Duration.zero);
+  }
 }

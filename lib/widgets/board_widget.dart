@@ -48,6 +48,11 @@ class BoardWidget extends StatelessWidget {
       ),
       child: Consumer<LudoProvider>(
         builder: (context, value, child) {
+          // Add safety check
+          if (value.players.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          
           //We use `Stack` to put all widgets on top of each other
           //so we make some logic to change the order of players to make sure
           //the player on top is the one who is playing
@@ -91,14 +96,11 @@ class BoardWidget extends StatelessWidget {
             if (key == "home") {
               playersPawn.addAll(
                 pawnsValue.map((e) {
-                  var player = value.players
-                      .firstWhere((element) => element.type == e.type);
+                  var player = value.players.firstWhere((element) => element.type == e.type);
                   return AnimatedPositioned(
                     key: ValueKey("${e.type.name}_${e.index}"),
-                    left: LudoPath.stepBox(
-                        ludoBoard(context), player.homePath[e.index][0]),
-                    top: LudoPath.stepBox(
-                        ludoBoard(context), player.homePath[e.index][1]),
+                    left: LudoPath.stepBox(ludoBoard(context), player.homePath[e.index][0]),
+                    top: LudoPath.stepBox(ludoBoard(context), player.homePath[e.index][1]),
                     width: boxStepSize(context),
                     height: boxStepSize(context),
                     duration: const Duration(milliseconds: 200),
@@ -109,12 +111,8 @@ class BoardWidget extends StatelessWidget {
             } else {
               // This is for every pawn in path (not in home)
               // I'm so lazy, so make it simple h3h3
-              List<double> coordinates = key
-                  .replaceAll("[", "")
-                  .replaceAll("]", "")
-                  .split(",")
-                  .map((e) => double.parse(e.trim()))
-                  .toList();
+              List<double> coordinates =
+                  key.replaceAll("[", "").replaceAll("]", "").split(",").map((e) => double.parse(e.trim())).toList();
 
               if (pawnsValue.length == 1) {
                 // This is for 1 pawn in 1 box
@@ -138,11 +136,8 @@ class BoardWidget extends StatelessWidget {
                       return AnimatedPositioned(
                         key: ValueKey("${e.type.name}_${e.index}"),
                         duration: const Duration(milliseconds: 200),
-                        left: LudoPath.stepBox(
-                                ludoBoard(context), coordinates[0]) +
-                            (index * 3),
-                        top: LudoPath.stepBox(
-                            ludoBoard(context), coordinates[1]),
+                        left: LudoPath.stepBox(ludoBoard(context), coordinates[0]) + (index * 3),
+                        top: LudoPath.stepBox(ludoBoard(context), coordinates[1]),
                         width: boxStepSize(context) - 5,
                         height: boxStepSize(context),
                         child: pawnsValue[index],
@@ -161,20 +156,17 @@ class BoardWidget extends StatelessWidget {
               children: [
                 ...playersPawn,
                 ...winners(context, value.winners),
-                turnIndicator(context, value.currentPlayer.type,
-                    value.currentPlayer.color, value.gameState),
+                turnIndicator(context, value.currentPlayer.type, value.currentPlayer.color, value.gameState),
               ],
             ),
           );
         },
       ),
-   
-   );
+    );
   }
 
   ///This is for the turn indicator widget
-  Widget turnIndicator(BuildContext context, LudoPlayerType turn, Color color,
-      LudoGameState stage) {
+  Widget turnIndicator(BuildContext context, LudoPlayerType turn, Color color, LudoGameState stage) {
     //0 is left, 1 is right
     int x = 0;
     //0 is top, 1 is bottom
@@ -226,21 +218,13 @@ class BoardWidget extends StatelessWidget {
           child: Container(
               alignment: Alignment.center,
               clipBehavior: Clip.antiAlias,
-              decoration:
-                  BoxDecoration(borderRadius: BorderRadius.circular(15)),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
               child: RichText(
                 textAlign: TextAlign.center,
-                text: TextSpan(
-                    style: TextStyle(fontSize: 8, color: color),
-                    children: [
-                      const TextSpan(
-                          text: "Your turn!\n",
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.bold)),
-                      TextSpan(
-                          text: stageText,
-                          style: const TextStyle(color: Colors.black)),
-                    ]),
+                text: TextSpan(style: TextStyle(fontSize: 8, color: color), children: [
+                  const TextSpan(text: "Your turn!\n", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  TextSpan(text: stageText, style: const TextStyle(color: Colors.black)),
+                ]),
               )),
         ),
       ),
@@ -248,8 +232,7 @@ class BoardWidget extends StatelessWidget {
   }
 
   ///This is for the winner widget
-  List<Widget> winners(BuildContext context, List<LudoPlayerType> winners) =>
-      List.generate(
+  List<Widget> winners(BuildContext context, List<LudoPlayerType> winners) => List.generate(
         winners.length,
         (index) {
           Widget crownImage = Image.asset("assets/games/ludo/crown/1st.png");
@@ -260,14 +243,11 @@ class BoardWidget extends StatelessWidget {
           int y = 0;
 
           if (index == 0) {
-            crownImage =
-                Image.asset("assets/images/crown/1st.png", fit: BoxFit.cover);
+            crownImage = Image.asset("assets/images/crown/1st.png", fit: BoxFit.cover);
           } else if (index == 1) {
-            crownImage =
-                Image.asset("assets/images/crown/2nd.png", fit: BoxFit.cover);
+            crownImage = Image.asset("assets/images/crown/2nd.png", fit: BoxFit.cover);
           } else if (index == 2) {
-            crownImage =
-                Image.asset("assets/images/crown/3rd.png", fit: BoxFit.cover);
+            crownImage = Image.asset("assets/images/crown/3rd.png", fit: BoxFit.cover);
           } else {
             return Container();
           }
@@ -301,12 +281,26 @@ class BoardWidget extends StatelessWidget {
               padding: EdgeInsets.all(boxStepSize(context)),
               child: Container(
                 clipBehavior: Clip.antiAlias,
-                decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(15)),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
                 child: crownImage,
               ),
             ),
           );
         },
       );
+
+  Widget buildBlockadeIndicator(BuildContext context, List<double> position) {
+    return Positioned(
+      left: LudoPath.stepBox(ludoBoard(context), position[0]),
+      top: LudoPath.stepBox(ludoBoard(context), position[1]),
+      child: Container(
+        width: boxStepSize(context),
+        height: boxStepSize(context),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.red, width: 2),
+          borderRadius: BorderRadius.circular(5),
+        ),
+      ),
+    );
+  }
 }
