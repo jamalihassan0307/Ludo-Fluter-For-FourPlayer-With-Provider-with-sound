@@ -206,7 +206,14 @@ class LudoProvider extends ChangeNotifier {
         // Set flag to show dice popup with all rolls
         shouldShowDicePopup = currentTurnDiceRolls.length > 1;
 
-        // All pawns are inside home and no 6 was rolled
+        // Check if all pawns are in home
+        if (currentPlayer.pawns.every((p) => p.step == currentPlayer.path.length - 1)) {
+          // All pawns are in home, automatically move to next player
+          currentTurnDiceRolls.clear();
+          return nextTurn();
+        }
+
+        // All pawns are inside starting area and no 6 was rolled
         if (currentPlayer.pawnInsideCount == 4 && !currentTurnDiceRolls.contains(6)) {
           // Clear current turn rolls
           currentTurnDiceRolls.clear();
@@ -220,6 +227,21 @@ class LudoProvider extends ChangeNotifier {
 
           // Also highlight pawns outside home
           currentPlayer.highlightOutside();
+
+          // Check if only one pawn can move, then move it automatically
+          List<int> movablePawnIndices = [];
+          for (int i = 0; i < currentPlayer.pawns.length; i++) {
+            if (currentPlayer.pawns[i].highlight) {
+              movablePawnIndices.add(i);
+            }
+          }
+
+          if (movablePawnIndices.length == 1) {
+            // Only one pawn can move, move it automatically
+            int index = movablePawnIndices[0];
+            move(currentPlayer.type, index, 0); // The actual step will be calculated in move()
+            return;
+          }
 
           _gameState = LudoGameState.pickPawn;
           notifyListeners();
@@ -245,6 +267,21 @@ class LudoProvider extends ChangeNotifier {
 
     // Calculate the new step position
     int newStep = selectedPlayer.pawns[index].step == -1 ? 0 : selectedPlayer.pawns[index].step + moveSteps;
+
+    // Check if this would exceed the home position
+    if (newStep >= selectedPlayer.path.length) {
+      // Can't move beyond home, need exact roll
+      int stepsToHome = selectedPlayer.path.length - 1 - selectedPlayer.pawns[index].step;
+      if (lastRoll != stepsToHome) {
+        // Can't move this pawn, cancel move
+        _isMoving = false;
+        _gameState = LudoGameState.pickPawn;
+        notifyListeners();
+        return;
+      }
+      // Set to exact home position
+      newStep = selectedPlayer.path.length - 1;
+    }
 
     // Move the pawn
     for (int i = selectedPlayer.pawns[index].step + 1; i <= newStep; i++) {
