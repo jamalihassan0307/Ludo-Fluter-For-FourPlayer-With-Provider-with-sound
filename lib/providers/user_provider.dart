@@ -16,10 +16,7 @@ class UserProvider extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      DocumentSnapshot doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .get();
+      DocumentSnapshot doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
       if (doc.exists) {
         _user = UserModel.fromMap(doc.data() as Map<String, dynamic>);
@@ -35,10 +32,7 @@ class UserProvider extends ChangeNotifier {
   Future<void> updateUserLastLogin() async {
     try {
       if (_user != null) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(_user!.uid)
-            .update({
+        await FirebaseFirestore.instance.collection('users').doc(_user!.uid).update({
           'lastLogin': DateTime.now(),
         });
       }
@@ -60,4 +54,19 @@ class UserProvider extends ChangeNotifier {
   }
 
   bool get isLoggedIn => _user != null;
-} 
+
+  Future<void> updateUserSettings(String key, bool value) async {
+    try {
+      if (_user != null) {
+        await FirebaseFirestore.instance.collection('users').doc(_user!.uid).update({
+          'settings.$key': value,
+        });
+
+        // Refresh user data
+        await setUser(_user!.uid);
+      }
+    } catch (e) {
+      print("Error updating settings: $e");
+    }
+  }
+}
