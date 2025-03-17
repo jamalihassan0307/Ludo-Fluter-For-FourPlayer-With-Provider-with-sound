@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ludo_flutter/ludo_provider.dart';
 import 'package:ludo_flutter/screens/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ludo_flutter/providers/user_provider.dart';
 
 import 'ludo_provider.dart';
 
@@ -24,8 +25,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-        create: (context) => LudoProvider(),
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => UserProvider()),
+          ChangeNotifierProvider(create: (context) => LudoProvider()),
+        ],
         child: MaterialApp(
             title: 'Ludo Game',
             debugShowCheckedModeBanner: false,

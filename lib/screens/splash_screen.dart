@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:ludo_flutter/constants.dart';
+import 'package:ludo_flutter/home_page.dart';
 import 'package:ludo_flutter/screens/login_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:ludo_flutter/providers/user_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -46,14 +50,28 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _controller.forward();
 
-    // Navigate to login screen after animation completes
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
-      }
-    });
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    final userId = prefs.getString('userId');
+
+    if (isLoggedIn && userId != null) {
+      // Set user in provider
+      await context.read<UserProvider>().setUser(userId);
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    }
   }
 
   @override

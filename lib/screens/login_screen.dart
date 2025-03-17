@@ -5,6 +5,9 @@ import 'package:ludo_flutter/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:ludo_flutter/screens/complete_profile_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ludo_flutter/providers/user_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -27,15 +30,26 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
+        final UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
 
-        // Navigate to home page on successful login
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
+        if (userCredential.user != null) {
+          // Set user in provider
+          await context.read<UserProvider>().setUser(userCredential.user!.uid);
+
+          // Save login state
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('isLoggedIn', true);
+          await prefs.setString('userId', userCredential.user!.uid);
+
+          // Navigate to home
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        }
       } on FirebaseAuthException catch (e) {
         String errorMessage = "Login failed. Please try again.";
 
