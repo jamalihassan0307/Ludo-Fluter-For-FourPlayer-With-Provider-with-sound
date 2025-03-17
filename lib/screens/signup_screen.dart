@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:ludo_flutter/constants.dart';
 import 'package:ludo_flutter/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -20,6 +22,15 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
+  Future<void> _saveUserDataLocally(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userId', userId);
+    await prefs.setBool('isLoggedIn', true);
+    await prefs.setBool('isGoogleSignIn', false);
+    await prefs.setString('userPassword', _passwordController.text);
+    await prefs.setString('userEmail', _emailController.text);
+  }
+
   Future<void> _signup() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -27,18 +38,52 @@ class _SignupScreenState extends State<SignupScreen> {
       });
 
       try {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        // Create user with email and password
+        final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
 
-        // Update user profile with name
-        await FirebaseAuth.instance.currentUser?.updateDisplayName(_nameController.text);
+        final user = userCredential.user;
+        if (user != null) {
+          // Update user profile with name
+          await user.updateDisplayName(_nameController.text);
 
-        // Navigate to home page on successful signup
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
+          // Store user data in Firestore
+          await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+            'uid': user.uid,
+            'name': _nameController.text,
+            'email': _emailController.text.trim(),
+            'createdAt': DateTime.now(),
+            'lastLogin': DateTime.now(),
+            'isGoogleSignIn': false,
+            'hasCompletedProfile': true,
+            'photoURL': null,
+            'stats': {
+              'gamesPlayed': 0,
+              'gamesWon': 0,
+              'totalScore': 0,
+            },
+            'settings': {
+              'soundEnabled': true,
+              'vibrationEnabled': true,
+              'notificationsEnabled': true,
+            },
+            'friends': [],
+            'activeGames': [],
+            'gameHistory': [],
+          });
+
+          // Save user data locally
+          await _saveUserDataLocally(user.uid);
+
+          // Navigate to home page on successful signup
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+          }
+        }
       } on FirebaseAuthException catch (e) {
         String errorMessage = "Signup failed. Please try again.";
 
@@ -49,16 +94,26 @@ class _SignupScreenState extends State<SignupScreen> {
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("An error occurred: $e")),
+          SnackBar(
+            content: Text("An error occurred: $e"),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       } finally {
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
