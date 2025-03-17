@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+// import 'package:flutter/scheduler.dart';
+import 'package:ludo_flutter/screens/complete_profile_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:ludo_flutter/main_screen.dart';
-import 'package:ludo_flutter/home_page.dart';
+// import 'package:ludo_flutter/main_screen.dart';
+// import 'package:ludo_flutter/home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ludo_flutter/ludo_provider.dart';
 import 'package:ludo_flutter/screens/splash_screen.dart';
 
-import 'ludo_provider.dart';
+// import 'ludo_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +31,9 @@ class MyApp extends StatelessWidget {
               primarySwatch: Colors.blue,
               fontFamily: 'Poppins',
             ),
-            home: SplashScreen()));
+            home: CompleteProfileScreen(
+              email: "jamalihassan0307@gmail.com",
+              isGoogleSignIn: true,
+            )));
   }
 }
