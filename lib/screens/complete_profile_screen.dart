@@ -66,13 +66,27 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
           // Store additional user data in Firestore
           await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+            'uid': user.uid,
             'name': _nameController.text,
             'email': widget.email ?? user.email,
             'createdAt': DateTime.now(),
             'lastLogin': DateTime.now(),
-            'photoURL': user.photoURL,
             'isGoogleSignIn': widget.isGoogleSignIn,
             'hasCompletedProfile': true,
+            'photoURL': user.photoURL,
+            'stats': {
+              'gamesPlayed': 0,
+              'gamesWon': 0,
+              'totalScore': 0,
+            },
+            'settings': {
+              'soundEnabled': true,
+              'vibrationEnabled': true,
+              'notificationsEnabled': true,
+            },
+            'friends': [],
+            'activeGames': [],
+            'gameHistory': [],
           });
 
           // Save user data locally
