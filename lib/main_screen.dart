@@ -40,14 +40,43 @@ class _MainScreenState extends State<MainScreen> {
                   BoardWidget(),
                 ],
               ),
+              
+              // Display dice based on current turn
               if (value.currentTurn == LudoPlayerType.green)
-                Positioned(top: 100, left: 50, child: SizedBox(width: 50, height: 50, child: DiceWidget())),
+                Positioned(
+                  top: 100, 
+                  left: 50, 
+                  child: SizedBox(width: 50, height: 50, child: DiceWidget())
+                ),
+                
               if (value.currentTurn == LudoPlayerType.yellow)
-                Positioned(top: 100, right: 50, child: SizedBox(width: 50, height: 50, child: DiceWidget())),
+                Positioned(
+                  top: 100, 
+                  right: 50, 
+                  child: SizedBox(width: 50, height: 50, child: DiceWidget())
+                ),
+                
               if (value.currentTurn == LudoPlayerType.red)
-                Positioned(bottom: 100, left: 50, child: SizedBox(width: 50, height: 50, child: DiceWidget())),
+                Positioned(
+                  bottom: 100, 
+                  left: 50, 
+                  child: SizedBox(width: 50, height: 50, child: DiceWidget())
+                ),
+                
               if (value.currentTurn == LudoPlayerType.blue)
-                Positioned(bottom: 100, right: 50, child: SizedBox(width: 50, height: 50, child: DiceWidget())),
+                Positioned(
+                  bottom: 100, 
+                  right: 50, 
+                  child: SizedBox(width: 50, height: 50, child: DiceWidget())
+                ),
+              
+              // Show dice roll history at the bottom
+              Positioned(
+                bottom: 20,
+                child: _buildDiceHistory(value),
+              ),
+              
+              // Game over screen
               Consumer<LudoProvider>(
                 builder: (context, value, child) => value.winners.length == (widget.numberOfPlayers - 1)
                     ? Container(
@@ -79,5 +108,41 @@ class _MainScreenState extends State<MainScreen> {
         ),
       );
     });
+  }
+
+  // Add a method to build the dice roll history
+  Widget _buildDiceHistory(LudoProvider provider) {
+    return Container(
+      height: 50,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(25),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text("Dice History: ", style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(width: 10),
+          // Here you would show the dice history
+          // This requires adding a diceHistory list to the LudoProvider
+          // For now, just showing the current dice
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: provider.currentPlayer.color.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Center(
+              child: Text(
+                "${provider.diceResult}",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

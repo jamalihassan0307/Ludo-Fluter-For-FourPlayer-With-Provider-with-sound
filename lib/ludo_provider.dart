@@ -100,7 +100,6 @@ class LudoProvider extends ChangeNotifier {
     _numberOfPlayers = numberOfPlayers;
     winners.clear();
     players.clear();
-    currentTurn = LudoPlayerType.green; // Reset to first player
     _gameState = LudoGameState.throwDice;
     _diceResult = 0;
     _consecutiveSixes = 0;
@@ -122,8 +121,17 @@ class LudoProvider extends ChangeNotifier {
       players.add(LudoPlayer(LudoPlayerType.blue));
     }
 
+    // Set current turn to the first player (red)
+    currentTurn = LudoPlayerType.red;
+
     notifyListeners();
   }
+
+  // Add dice history list
+  final List<int> diceHistory = [];
+
+  ///Track consecutive sixes
+  int _consecutiveSixes = 0;
 
   ///This is the function that will be called to throw the dice
   void throwDice() async {
@@ -145,6 +153,13 @@ class LudoProvider extends ChangeNotifier {
       _diceStarted = false;
       var random = Random();
       _diceResult = random.nextBool() ? 6 : random.nextInt(6) + 1; //Random between 1 - 6
+
+      // Add to dice history
+      diceHistory.add(_diceResult);
+      if (diceHistory.length > 10) {
+        diceHistory.removeAt(0); // Keep only the last 10 rolls
+      }
+
       notifyListeners();
 
       if (diceResult == 6) {
@@ -152,20 +167,30 @@ class LudoProvider extends ChangeNotifier {
 
         // Check for three consecutive sixes
         if (_consecutiveSixes == 3) {
+          // Reset consecutive sixes counter
           _consecutiveSixes = 0;
+
+          // Show message about losing turn due to 3 consecutive sixes
+          _showThreeSixesMessage();
+
+          // Move to next player's turn
           nextTurn();
           return;
         }
 
-        currentPlayer.highlightAllPawns();
-        _gameState = LudoGameState.pickPawn;
+        // For a 6, player gets another roll without moving
+        _gameState = LudoGameState.throwDice;
         notifyListeners();
+        return;
       } else {
-        /// all pawns are inside home
+        // Reset consecutive sixes counter for non-6 roll
+        _consecutiveSixes = 0;
+
+        // All pawns are inside home and no 6 was rolled
         if (currentPlayer.pawnInsideCount == 4) {
           return nextTurn();
         } else {
-          ///Hightlight all pawn outside
+          // Highlight all pawns outside home
           currentPlayer.highlightOutside();
           _gameState = LudoGameState.pickPawn;
           notifyListeners();
@@ -206,12 +231,8 @@ class LudoProvider extends ChangeNotifier {
 
       ///If User have 6 dice, but it inside finish line, it will make him to throw again, else it will turn to next player
       if (currentPlayer.pawns.every((element) => !element.highlight)) {
-        if (diceResult == 6) {
-          _gameState = LudoGameState.throwDice;
-        } else {
-          nextTurn();
-          return;
-        }
+        nextTurn();
+        return;
       }
 
       if (currentPlayer.pawns.where((element) => element.highlight).length == 1) {
@@ -301,9 +322,6 @@ class LudoProvider extends ChangeNotifier {
     }
   }
 
-  // Add rule for three consecutive sixes
-  int _consecutiveSixes = 0;
-
   // Modify isBlockade to only check active players
   bool isBlockade(List<double> position, LudoPlayerType type) {
     try {
@@ -324,4 +342,24 @@ class LudoProvider extends ChangeNotifier {
   }
 
   static LudoProvider read(BuildContext context) => context.read();
+
+  // Add a method for testing with predefined dice rolls
+  List<int> testRolls = [6, 6, 1, 6, 3, 4, 5, 6, 2]; // Example test rolls
+  int testRollIndex = 0;
+
+  void useTestRoll(bool useTest) {
+    if (useTest) {
+      // Override the dice roll with test values
+      _diceResult = testRolls[testRollIndex % testRolls.length];
+      testRollIndex++;
+    }
+    notifyListeners();
+  }
+
+  // Helper method to show message about 3 consecutive sixes
+  void _showThreeSixesMessage() {
+    // This would be implemented to show a message to the user
+    // For now, we'll just print to console
+    print("Three consecutive sixes! Turn canceled.");
+  }
 }

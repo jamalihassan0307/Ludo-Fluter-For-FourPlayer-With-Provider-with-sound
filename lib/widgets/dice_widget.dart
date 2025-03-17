@@ -18,17 +18,22 @@ class DiceWidget extends StatelessWidget {
           return const SizedBox.shrink();
         }
         
-        return RippleAnimation(
-          color: value.gameState == LudoGameState.throwDice ? value.currentPlayer.color : Colors.white.withOpacity(0),
-          ripplesCount: 3,
-          minRadius: 30,
-          repeat: true,
-          child: CupertinoButton(
-            onPressed: value.throwDice,
-            padding: const EdgeInsets.only(),
-            child: value.diceStarted ? Image.asset("assets/images/dice/draw.gif", fit: BoxFit.contain) : Image.asset("assets/images/dice/${value.diceResult}.png", fit: BoxFit.contain),
-          ),
-        );
+        try {
+          return RippleAnimation(
+            color: value.gameState == LudoGameState.throwDice ? value.currentPlayer.color : Colors.white.withOpacity(0),
+            ripplesCount: 3,
+            minRadius: 30,
+            repeat: true,
+            child: CupertinoButton(
+              onPressed: value.throwDice,
+              padding: const EdgeInsets.only(),
+              child: value.diceStarted ? Image.asset("assets/images/dice/draw.gif", fit: BoxFit.contain) : Image.asset("assets/images/dice/${value.diceResult}.png", fit: BoxFit.contain),
+            ),
+          );
+        } catch (e) {
+          // Fallback if there's an error
+          return const SizedBox.shrink();
+        }
       },
     );
   }
