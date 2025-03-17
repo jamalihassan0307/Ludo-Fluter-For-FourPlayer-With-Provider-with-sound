@@ -2,16 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:ludo_flutter/constants.dart';
 import 'package:ludo_flutter/ludo_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:simple_ripple_animation/simple_ripple_animation.dart';
 
 ///Widget for the pawn
 class PawnWidget extends StatelessWidget {
-  final int index;
   final LudoPlayerType type;
+  final int index;
   final int step;
   final bool highlight;
 
-  const PawnWidget(this.index, this.type, {super.key, this.highlight = false, this.step = -1});
+  const PawnWidget({
+    Key? key,
+    required this.type,
+    required this.index,
+    required this.step,
+    required this.highlight,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,71 +38,62 @@ class PawnWidget extends StatelessWidget {
     return IgnorePointer(
       ignoring: !highlight,
       child: Stack(
-        alignment: Alignment.center,
         children: [
-          if (highlight)
-            RippleAnimation(
+          Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
               color: color,
-              minRadius: 20,
-              repeat: true,
-              ripplesCount: 3,
-              child: const SizedBox.shrink(),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
             ),
-          Consumer<LudoProvider>(
-            builder: (context, provider, child) => GestureDetector(
-              onTap: () {
-                // Show selection dialog
-                if (highlight) {
-                  _showSelectionDialog(context, provider);
-                }
-              },
-              child: Container(
-                decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: color, width: 2)),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
+            child: const Center(
+              child: Text(
+                "",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
                 ),
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
+          if (highlight)
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: InkWell(
+                onTap: () {
+                  // Get the provider
+                  final provider = Provider.of<LudoProvider>(context, listen: false);
 
-  void _showSelectionDialog(BuildContext context, LudoProvider provider) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Move Pawn ${index + 1}?", 
-          style: TextStyle(color: provider.currentPlayer.color),
-        ),
-        content: Text(
-          step == -1 
-            ? "Move this pawn out of home?" 
-            : "Move this pawn ${provider.diceResult} steps forward?",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text("Cancel"),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              if (step == -1) {
-                provider.move(type, index, (step + 1) + 1);
-              } else {
-                provider.move(type, index, (step + 1) + provider.diceResult);
-              }
-            },
-            child: const Text("Move"),
-          ),
+                  // Check if there are multiple dice rolls
+                  if (provider.currentTurnDiceRolls.length > 1) {
+                    // Show the dice popup
+                    provider.shouldShowDicePopup = true;
+                  } else if (provider.currentTurnDiceRolls.length == 1) {
+                    // Only one dice roll, move directly
+                    int diceRoll = provider.currentTurnDiceRolls[0];
+
+                    // Move the pawn
+                    if (step == -1) {
+                      // Move out of home (requires a 6)
+                      if (diceRoll == 6) {
+                        provider.moveWithDiceRoll(type, index, diceRoll);
+                      }
+                    } else {
+                      // Move forward
+                      provider.moveWithDiceRoll(type, index, diceRoll);
+                    }
+                  }
+                },
+              ),
+            ),
         ],
       ),
     );

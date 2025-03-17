@@ -31,7 +31,7 @@ class DiceWidget extends StatelessWidget {
             child: CupertinoButton(
               onPressed: isActive ? value.throwDice : null,
               padding: const EdgeInsets.only(),
-              child: value.diceStarted
+              child: value.diceStarted && isActive
                   ? Image.asset("assets/images/dice/draw.gif", fit: BoxFit.contain)
                   : Image.asset("assets/images/dice/${value.diceResult}.png", fit: BoxFit.contain),
             ),

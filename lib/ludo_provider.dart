@@ -72,26 +72,89 @@ class LudoProvider extends ChangeNotifier {
 
   ///This method will check if the pawn can kill another pawn or not by checking the step of the pawn
   bool checkToKill(LudoPlayerType type, int index, int step, List<List<double>> path) {
-    bool killSomeone = false;
+    if (step < 0) return false; // Can't kill if pawn is not on the board yet
 
-    // Only check for players that are actually in the game
+    // Get the current position
+    List<double> position = path[step];
+
+    // Check if any other player's pawn is at this position
     for (var player in players) {
       if (player.type != type) {
-        // Don't check current player's pawns
-        for (int i = 0; i < player.pawns.length; i++) {
-          var pawn = player.pawns[i];
-          if (pawn.step > -1 &&
-              !LudoPath.safeArea.map((e) => e.toString()).contains(player.path[pawn.step].toString())) {
-            if (player.path[pawn.step].toString() == path[step - 1].toString()) {
-              killSomeone = true;
-              player.movePawn(i, -1);
-              notifyListeners();
-            }
+        for (var i = 0; i < player.pawns.length; i++) {
+          // Skip pawns that are not on the board or in safe zones
+          if (player.pawns[i].step < 0 || isSafeZone(player.path[player.pawns[i].step])) {
+            continue;
+          }
+
+          // Check if position matches
+          if (player.pawns[i].step >= 0 &&
+              player.pawns[i].step < player.path.length &&
+              player.path[player.pawns[i].step].toString() == position.toString()) {
+            // Kill the pawn
+            player.movePawn(i, -1);
+            return true;
           }
         }
       }
     }
-    return killSomeone;
+    return false;
+  }
+
+  // Add a helper method to check if a position is in a safe zone
+  bool isSafeZone(List<double> position) {
+    // Define safe zone positions
+    List<String> safeZones = [
+      // Starting positions for each color (just after home)
+      "[40.0, 280.0]", // Green start
+      "[200.0, 40.0]", // Yellow start
+      "[280.0, 200.0]", // Blue start
+      "[120.0, 280.0]", // Red start
+
+      // Star positions on the board
+      "[40.0, 200.0]",
+      "[80.0, 120.0]",
+      "[120.0, 40.0]",
+      "[200.0, 80.0]",
+      "[280.0, 120.0]",
+      "[240.0, 200.0]",
+      "[200.0, 280.0]",
+      "[120.0, 240.0]",
+
+      // Home path positions (last 6 steps before home)
+      // Green home path
+      "[80.0, 160.0]",
+      "[80.0, 180.0]",
+      "[80.0, 200.0]",
+      "[80.0, 220.0]",
+      "[80.0, 240.0]",
+      "[80.0, 260.0]",
+
+      // Yellow home path
+      "[160.0, 80.0]",
+      "[180.0, 80.0]",
+      "[200.0, 80.0]",
+      "[220.0, 80.0]",
+      "[240.0, 80.0]",
+      "[260.0, 80.0]",
+
+      // Blue home path
+      "[240.0, 160.0]",
+      "[240.0, 180.0]",
+      "[240.0, 200.0]",
+      "[240.0, 220.0]",
+      "[240.0, 240.0]",
+      "[240.0, 260.0]",
+
+      // Red home path
+      "[160.0, 240.0]",
+      "[180.0, 240.0]",
+      "[200.0, 240.0]",
+      "[220.0, 240.0]",
+      "[240.0, 240.0]",
+      "[260.0, 240.0]",
+    ];
+
+    return safeZones.contains(position.toString());
   }
 
   int _numberOfPlayers = 4;
@@ -201,13 +264,13 @@ class LudoProvider extends ChangeNotifier {
         currentTurnDiceRolls.clear();
 
         // Move to next player's turn after a delay
-        await Future.delayed(const Duration(seconds: 1));
+        // await Future.delayed(const Duration(seconds: 1));
         nextTurn();
         return;
       }
 
       // For a 6, roll again after a short delay
-      await Future.delayed(const Duration(milliseconds: 500));
+      // await Future.delayed(const Duration(milliseconds: 500));
       _gameState = LudoGameState.throwDice;
       notifyListeners();
     } else {
@@ -223,7 +286,7 @@ class LudoProvider extends ChangeNotifier {
       if (currentPlayer.pawns.every((p) => p.step == currentPlayer.path.length - 1)) {
         // All pawns are in home, automatically move to next player
         currentTurnDiceRolls.clear();
-        await Future.delayed(const Duration(milliseconds: 500));
+        // await Future.delayed(const Duration(milliseconds: 500));
         return nextTurn();
       }
 
@@ -231,7 +294,7 @@ class LudoProvider extends ChangeNotifier {
       if (currentPlayer.pawnInsideCount == 4 && !currentTurnDiceRolls.contains(6)) {
         // Clear current turn rolls
         currentTurnDiceRolls.clear();
-        await Future.delayed(const Duration(milliseconds: 500));
+        // await Future.delayed(const Duration(milliseconds: 500));
         return nextTurn();
       } else {
         // Highlight pawns that can move
@@ -287,7 +350,7 @@ class LudoProvider extends ChangeNotifier {
       if (_stopMoving) break;
       selectedPlayer.movePawn(index, i);
       notifyListeners();
-      await Future.delayed(const Duration(milliseconds: 200));
+      // await Future.delayed(const Duration(milliseconds: 200));
     }
 
     // If a kill happened, give an extra turn
@@ -388,77 +451,21 @@ class LudoProvider extends ChangeNotifier {
   }
 
   // Method to move pawn with specific dice roll
-  void moveWithDiceRoll(LudoPlayerType type, int index, int diceRoll) async {
-    if (_isMoving) return;
-    _isMoving = true;
-    _gameState = LudoGameState.moving;
-
-    currentPlayer.highlightAllPawns(false);
+  void moveWithDiceRoll(LudoPlayerType type, int index, int diceRoll) {
+    // Get the player
     var selectedPlayer = player(type);
-
+    
     // Remove the used dice roll from the list
     currentTurnDiceRolls.remove(diceRoll);
-
+    
     // If moving from home, use 1 step (requires a 6)
-    int moveSteps = selectedPlayer.pawns[index].step == -1 ? 1 : diceRoll;
-
-    // Calculate the new step position
-    int newStep = selectedPlayer.pawns[index].step == -1 ? 0 : selectedPlayer.pawns[index].step + moveSteps;
-
-    // Check if this would exceed the home position
-    if (newStep >= selectedPlayer.path.length) {
-      // Can't move beyond home, need exact roll
-      int stepsToHome = selectedPlayer.path.length - 1 - selectedPlayer.pawns[index].step;
-      if (diceRoll != stepsToHome) {
-        // Can't move this pawn, cancel move
-        _isMoving = false;
-        _gameState = LudoGameState.pickPawn;
-        notifyListeners();
-        return;
+    if (selectedPlayer.pawns[index].step == -1) {
+      if (diceRoll == 6) {
+        move(type, index, 0);
       }
-      // Set to exact home position
-      newStep = selectedPlayer.path.length - 1;
-    }
-
-    // Move the pawn
-    for (int i = selectedPlayer.pawns[index].step + 1; i <= newStep; i++) {
-      if (_stopMoving) break;
-      selectedPlayer.movePawn(index, i);
-      notifyListeners();
-      await Future.delayed(const Duration(milliseconds: 200));
-    }
-
-    // If a kill happened, give an extra turn
-    if (checkToKill(type, index, newStep, selectedPlayer.path)) {
-      _gameState = LudoGameState.throwDice;
-      _isMoving = false;
-      await Audio.playKill();
-      notifyListeners();
-      return;
-    }
-
-    validateWin(type);
-
-    // Check if there are more dice rolls to use
-    if (currentTurnDiceRolls.isNotEmpty) {
-      // Still have dice rolls to use
-      _gameState = LudoGameState.pickPawn;
-
-      // Highlight pawns that can move with remaining dice
-      currentPlayer.highlightAllPawns(false);
-      if (currentTurnDiceRolls.contains(6)) {
-        currentPlayer.highlightInside();
-      }
-      currentPlayer.highlightOutside();
-
-      // Show popup with remaining dice
-      shouldShowDicePopup = true;
     } else {
-      // No more dice rolls, end turn
-      nextTurn();
+      // Move forward
+      move(type, index, selectedPlayer.pawns[index].step + diceRoll);
     }
-
-    _isMoving = false;
-    notifyListeners();
   }
 }

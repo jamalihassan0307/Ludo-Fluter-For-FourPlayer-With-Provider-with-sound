@@ -22,9 +22,10 @@ class LudoPlayer {
   LudoPlayer(this.type) {
     for (int i = 0; i < 4; i++) {
       pawns.add(PawnWidget(
-        i,
-        type,
-        // step: 50,
+        type: type,
+        index: i,
+        step: -1,
+        highlight: false,
       ));
     }
 
@@ -61,14 +62,26 @@ class LudoPlayer {
 
   ///Moving mean you'll replace the current widget with the new widget
   void movePawn(int index, int step) async {
-    pawns[index] = PawnWidget(index, type, step: step, highlight: false);
+    pawns[index] = PawnWidget(
+      type: type,
+      index: index,
+      step: step,
+      highlight: false,
+    );
   }
 
   ///Highlight the pawn
   void highlightPawn(int index, [bool highlight = true]) {
     var pawn = pawns[index];
     pawns.removeAt(index);
-    pawns.insert(index, PawnWidget(index, pawn.type, highlight: highlight, step: pawn.step));
+    pawns.insert(
+        index,
+        PawnWidget(
+          type: pawn.type,
+          index: index,
+          step: pawn.step,
+          highlight: highlight,
+        ));
   }
 
   ///Highlight all the pawns
