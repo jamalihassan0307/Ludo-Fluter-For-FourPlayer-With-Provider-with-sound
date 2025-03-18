@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:ludo_flutter/main_screen.dart';
@@ -7,9 +6,7 @@ import 'package:ludo_flutter/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:ludo_flutter/constants.dart';
 import 'package:ludo_flutter/screens/settings_page.dart';
-// import 'package:ludo_flutter/screens/profile_page.dart';
-// import 'dart:math' as math;
-// import 'dart:ui';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -33,6 +30,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _tabController.dispose();
     super.dispose();
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -473,53 +471,50 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             Positioned.fill(
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(24),
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-                                  child: Container(
-                                    color: Colors.black.withOpacity(0.7),
-                                    child: Center(
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.all(10),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(0.1),
-                                              shape: BoxShape.circle,
+                                child: Container(
+                                  color: Colors.black.withOpacity(0.7),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.1),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            Icons.lock_clock,
+                                            color: Colors.white,
+                                            size: 24,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(16),
+                                            border: Border.all(
+                                              color: Colors.white.withOpacity(0.2),
+                                              width: 1,
                                             ),
-                                            child: const Icon(
-                                              Icons.lock_clock,
+                                          ),
+                                          child: const Text(
+                                            "Coming Soon",
+                                            style: TextStyle(
                                               color: Colors.white,
-                                              size: 24,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 11,
+                                              letterSpacing: 0.5,
                                             ),
                                           ),
-                                          const SizedBox(height: 8),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 6,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(0.1),
-                                              borderRadius: BorderRadius.circular(16),
-                                              border: Border.all(
-                                                color: Colors.white.withOpacity(0.2),
-                                                width: 1,
-                                              ),
-                                            ),
-                                            child: const Text(
-                                              "Coming Soon",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 11,
-                                                letterSpacing: 0.5,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
