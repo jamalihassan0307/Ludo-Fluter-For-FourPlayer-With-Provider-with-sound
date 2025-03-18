@@ -192,7 +192,12 @@ class LudoProvider extends ChangeNotifier {
 
   // Track dice rolls in current turn
   List<int> currentTurnDiceRolls = [];
-  bool shouldShowDicePopup = false;
+  bool _shouldShowDicePopup = false;
+  bool get shouldShowDicePopup => _shouldShowDicePopup;
+  set shouldShowDicePopup(bool value) {
+    _shouldShowDicePopup = value;
+    notifyListeners();
+  }
 
   // Track consecutive sixes
   int _consecutiveSixes = 0;
@@ -232,8 +237,8 @@ class LudoProvider extends ChangeNotifier {
 
     // Reduce delay for faster gameplay
     await Future.delayed(const Duration(milliseconds: 300));
-    _diceStarted = false;
-    var random = Random();
+      _diceStarted = false;
+      var random = Random();
     _diceResult = random.nextInt(6) + 1; // Random between 1-6
 
     // Add to dice history
@@ -283,8 +288,8 @@ class LudoProvider extends ChangeNotifier {
       // Clear current turn rolls
       currentTurnDiceRolls.clear();
       await Future.delayed(const Duration(milliseconds: 300));
-      return nextTurn();
-    } else {
+          return nextTurn();
+        } else {
       // Highlight pawns that can move
       if (currentTurnDiceRolls.contains(6)) {
         // Also highlight pawns inside home
@@ -306,7 +311,7 @@ class LudoProvider extends ChangeNotifier {
         // Only one pawn can move, move it automatically
         int index = movablePawnIndices[0];
         move(currentPlayer.type, index, 0); // The actual step will be calculated in move()
-        return;
+            return;
       }
 
       _gameState = LudoGameState.pickPawn;
@@ -357,12 +362,12 @@ class LudoProvider extends ChangeNotifier {
 
       // If a kill happened, give an extra turn
       if (killed) {
-        _gameState = LudoGameState.throwDice;
-        _isMoving = false;
+      _gameState = LudoGameState.throwDice;
+      _isMoving = false;
         await Audio.playKill();
-        notifyListeners();
-        return;
-      }
+      notifyListeners();
+      return;
+    }
 
       // Check if any pawns can move with the remaining dice
       bool canMoveAny = false;

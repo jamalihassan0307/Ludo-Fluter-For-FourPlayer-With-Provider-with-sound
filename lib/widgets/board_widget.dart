@@ -16,12 +16,12 @@ class BoardWidget extends StatelessWidget {
   double ludoBoard(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     if (width > 500) {
-      return 500;
+      return 320;
     } else {
       if (width < 300) {
-        return 300;
+        return 240;
       } else {
-        return width - 20;
+        return width - 100;
       }
     }
   }
@@ -34,12 +34,26 @@ class BoardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(10),
+      margin: const EdgeInsets.all(5),
       clipBehavior: Clip.antiAlias,
       width: ludoBoard(context),
       height: ludoBoard(context),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 15,
+            spreadRadius: 1,
+            offset: const Offset(0, 5),
+          ),
+          BoxShadow(
+            color: Colors.white.withOpacity(0.5),
+            blurRadius: 15,
+            spreadRadius: -5,
+            offset: const Offset(0, -5),
+          ),
+        ],
         image: const DecorationImage(
           image: AssetImage("assets/images/board.png"),
           fit: BoxFit.cover,
