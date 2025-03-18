@@ -3,13 +3,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
+import '../models/offline_user.dart';
 
 class UserProvider extends ChangeNotifier {
-  UserModel? _user;
+  dynamic _user;
   bool _isLoading = false;
+  bool _isOfflineUser = false;
 
-  UserModel? get user => _user;
+  dynamic get user => _user;
   bool get isLoading => _isLoading;
+  bool get isOfflineUser => _isOfflineUser;
+
+  void setOfflineUser(OfflineUser user) {
+    _user = user;
+    _isOfflineUser = true;
+    notifyListeners();
+  }
 
   Future<void> setUser(String uid) async {
     try {

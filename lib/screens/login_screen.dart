@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ludo_flutter/providers/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ludo_flutter/models/offline_user.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -24,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
-  Future<void> _login() async {
+  Future<void> _login(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
@@ -75,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _signInWithGoogle() async {
+  Future<void> _signInWithGoogle(BuildContext context) async {
     setState(() {
       _isLoading = true;
     });
@@ -145,6 +146,27 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  void _handleOfflinePlay() {
+    // Create a default offline user
+    final offlineUser = OfflineUser(
+      email: 'guest@local.com',
+      password: 'guest',
+      name: 'Guest Player',
+      stats: {
+        'gamesPlayed': 0,
+        'gamesWon': 0,
+        'totalScore': 0,
+      },
+    );
+
+    // Set offline user in provider and navigate to home
+    context.read<UserProvider>().setOfflineUser(offlineUser);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+    );
   }
 
   @override
@@ -313,7 +335,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               width: double.infinity,
                               height: 50,
                               child: ElevatedButton(
-                                onPressed: _isLoading ? null : _login,
+                                onPressed: _isLoading ? null : () => _login(context),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: LudoColor.blue,
                                   shape: RoundedRectangleBorder(
@@ -381,7 +403,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton.icon(
-                        onPressed: _isLoading ? null : _signInWithGoogle,
+                        onPressed: _isLoading ? null : () => _signInWithGoogle(context),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
@@ -399,6 +421,33 @@ class _LoginScreenState extends State<LoginScreen> {
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.grey[700],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: _isLoading ? null : _handleOfflinePlay,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: LudoColor.yellow,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 5,
+                        ),
+                        icon: const Icon(
+                          Icons.sports_esports,
+                          color: Colors.black87,
+                        ),
+                        label: Text(
+                          "Play Offline",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[800],
                           ),
                         ),
                       ),
