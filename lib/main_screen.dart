@@ -41,98 +41,170 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<LudoProvider>(builder: (context, value, child) {
-      if (value.shouldShowDicePopup) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted && value.shouldShowDicePopup) {
-            _showDicePopup(context, value);
-            Future.microtask(() => value.shouldShowDicePopup = false);
-          }
-        });
-      }
-
-      return Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                const Color(0xFF2C3E50),
-                const Color(0xFF3498DB),
-                Colors.purple.shade300,
-              ],
-              stops: const [0.0, 0.5, 1.0],
+    return WillPopScope(
+      onWillPop: () async {
+        bool shouldPop = await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
-          ),
-          child: SafeArea(
-            child: Stack(
+            title: Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                "Exit Game",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Animated background patterns
-                Positioned.fill(
-                  child: CustomPaint(
-                    painter: AnimatedBackgroundPainter(),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: const Text(
+                    "Are you sure you want to exit the game? Your progress will be lost.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
                   ),
                 ),
-                Column(
-                  children: [
-                    _buildGameHeader(value),
-                    Expanded(
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          const BoardWidget(),
-                          if (_showTurnIndicator)
-                            AnimatedBuilder(
-                              animation: _animationController,
-                              builder: (context, child) {
-                                return Container(
-                                  width: 250,
-                                  height: 250,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: value.currentPlayer.color.withOpacity(_animationController.value * 0.3),
-                                      width: 3,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          _buildDicePositions(value),
-                          if (value.winners.length == (widget.numberOfPlayers - 1))
-                            _buildGameOverScreen(value),
-                        ],
-                      ),
-                    ),
-                    _buildGameFooter(value),
-                  ],
-                ),
               ],
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.grey,
+                ),
+                child: const Text(
+                  "CANCEL",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.red,
+                ),
+                child: const Text(
+                  "EXIT",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ),
-        ),
-        floatingActionButton: AnimatedScale(
-          duration: const Duration(milliseconds: 200),
-          scale: _showTurnIndicator ? 0.8 : 1.0,
-          child: FloatingActionButton(
-            backgroundColor: value.currentPlayer.color,
-            elevation: 8,
-            child: const Icon(Icons.help_outline),
-            onPressed: () {
-              setState(() {
-                _showTurnIndicator = !_showTurnIndicator;
-              });
-              if (!_showTurnIndicator) {
-                _animationController.reset();
-              } else {
-                _animationController.repeat(reverse: true);
-              }
-            },
+        );
+        return shouldPop;
+      },
+      child: Consumer<LudoProvider>(builder: (context, value, child) {
+        if (value.shouldShowDicePopup) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted && value.shouldShowDicePopup) {
+              _showDicePopup(context, value);
+              Future.microtask(() => value.shouldShowDicePopup = false);
+            }
+          });
+        }
+
+        return Scaffold(
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF2C3E50),
+                  const Color(0xFF3498DB),
+                  Colors.purple.shade300,
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
+            ),
+            child: SafeArea(
+              child: Stack(
+                children: [
+                  // Animated background patterns
+                  Positioned.fill(
+                    child: CustomPaint(
+                      painter: AnimatedBackgroundPainter(),
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      _buildGameHeader(value),
+                      Expanded(
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            const BoardWidget(),
+                            if (_showTurnIndicator)
+                              AnimatedBuilder(
+                                animation: _animationController,
+                                builder: (context, child) {
+                                  return Container(
+                                    width: 250,
+                                    height: 250,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: value.currentPlayer.color.withOpacity(_animationController.value * 0.3),
+                                        width: 3,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            _buildDicePositions(value),
+                            if (value.winners.length == (widget.numberOfPlayers - 1))
+                              _buildGameOverScreen(value),
+                          ],
+                        ),
+                      ),
+                      _buildGameFooter(value),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      );
-    });
+          floatingActionButton: AnimatedScale(
+            duration: const Duration(milliseconds: 200),
+            scale: _showTurnIndicator ? 0.8 : 1.0,
+            child: FloatingActionButton(
+              backgroundColor: value.currentPlayer.color,
+              elevation: 8,
+              child: const Icon(Icons.help_outline),
+              onPressed: () {
+                setState(() {
+                  _showTurnIndicator = !_showTurnIndicator;
+                });
+                if (!_showTurnIndicator) {
+                  _animationController.reset();
+                } else {
+                  _animationController.repeat(reverse: true);
+                }
+              },
+            ),
+          ),
+        );
+      }),
+    );
   }
 
   Widget _buildGameHeader(LudoProvider provider) {
