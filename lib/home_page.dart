@@ -97,6 +97,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         ],
                       ),
                       labelColor: const Color(0xFF1a237e),
+                      // padding: EdgeInsets.symmetric(horizontal: 0),
                       unselectedLabelColor: Colors.white,
                       labelStyle: const TextStyle(
                         fontWeight: FontWeight.bold,
