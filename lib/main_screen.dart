@@ -234,101 +234,126 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildDicePositions(LudoProvider value) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final boardSize = screenWidth * 0.8; // Approximate board size
+    final diceOffset = boardSize * 0.15; // Offset from board edge
+
     return Stack(
       children: [
-        // Green Dice
+        // Red Dice (Bottom Left)
         Positioned(
-          top: 20,
-          left: 10,
-          child: _buildDiceWithLabel(value, LudoPlayerType.green, "Green", Alignment.centerRight),
+          bottom: screenHeight * 0.02,
+          left: screenWidth * 0.01,
+          child: _buildDiceWithLabel(value, LudoPlayerType.red, "Red", Alignment.topCenter),
         ),
 
-        // Yellow Dice
+        // Green Dice (Top Left)
+        if (widget.numberOfPlayers >= 4)
+          Positioned(
+            top: screenHeight * 0.02,
+            left: screenWidth * 0.01,
+            child: _buildDiceWithLabel(value, LudoPlayerType.green, "Green", Alignment.bottomCenter),
+          ),
+
+        // Yellow Dice (Top Right)
         Positioned(
-          top: 20,
-          right: 10,
-          child: _buildDiceWithLabel(value, LudoPlayerType.yellow, "Yellow", Alignment.centerLeft),
+          top: screenHeight * 0.02,
+          right: screenWidth * 0.01,
+          child: _buildDiceWithLabel(value, LudoPlayerType.yellow, "Yellow", Alignment.bottomCenter),
         ),
 
-        // Red Dice
-        Positioned(
-          bottom: 0,
-          left: 10,
-          child: _buildDiceWithLabel(value, LudoPlayerType.red, "Red", Alignment.centerRight),
-        ),
-
-        // Blue Dice
-        Positioned(
-          bottom: 0,
-          right: 10,
-          child: _buildDiceWithLabel(value, LudoPlayerType.blue, "Blue", Alignment.centerLeft),
-        ),
+        // Blue Dice (Bottom Right)
+        if (widget.numberOfPlayers >= 3)
+          Positioned(
+            bottom: screenHeight * 0.02,
+          right: screenWidth * 0.01,
+            child: _buildDiceWithLabel(value, LudoPlayerType.blue, "Blue", Alignment.topCenter),
+          ),
       ],
     );
   }
 
   Widget _buildDiceWithLabel(LudoProvider value, LudoPlayerType type, String label, Alignment alignment) {
     final isCurrentTurn = value.currentTurn == type;
+    final isPlayerActive = value.players.any((player) => player.type == type);
+
+    if (!isPlayerActive) return const SizedBox.shrink();
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        if (isCurrentTurn)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            decoration: BoxDecoration(
-              color: _getPlayerColor(type),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              "Current Turn",
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 7,
-              ),
-            ),
-          ),
-        const SizedBox(height: 2),
-        SizedBox(
+        // if (isCurrentTurn)
+        //   Container(
+        //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        //     decoration: BoxDecoration(
+        //       color: _getPlayerColor(type),
+        //       borderRadius: BorderRadius.circular(8),
+        //       boxShadow: [
+        //         BoxShadow(
+        //           color: _getPlayerColor(type).withOpacity(0.3),
+        //           blurRadius: 4,
+        //           spreadRadius: 1,
+        //         ),
+        //       ],
+        //     ),
+        //     child: const Text(
+        //       "Current Turn",
+        //       style: TextStyle(
+        //         color: Colors.white,
+        //         fontWeight: FontWeight.bold,
+        //         fontSize: 10,
+        //       ),
+        //     ),
+        //   ),
+        // const SizedBox(height: 4),
+        Container(
           width: 35,
           height: 35,
-          child: Stack(
-            children: [
-              Opacity(
-                opacity: isCurrentTurn ? 1.0 : 0.3,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(6),
-                    boxShadow: isCurrentTurn
-                        ? [
-                            BoxShadow(
-                              color: _getPlayerColor(type).withOpacity(0.5),
-                              blurRadius: 6,
-                              spreadRadius: 1,
-                            ),
-                          ]
-                        : null,
-                    border: Border.all(
-                      color: _getPlayerColor(type),
-                      width: isCurrentTurn ? 1.5 : 1,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: _getPlayerColor(type),
+              width: isCurrentTurn ? 2 : 1,
+            ),
+            boxShadow: isCurrentTurn
+                ? [
+                    BoxShadow(
+                      color: _getPlayerColor(type).withOpacity(0.3),
+                      blurRadius: 8,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 2),
                     ),
-                  ),
-                  child: DiceWidget(isActive: isCurrentTurn),
-                ),
-              ),
-            ],
+                  ]
+                : null,
+          ),
+          child: Opacity(
+            opacity: isCurrentTurn ? 1.0 : 0.4,
+            child: DiceWidget(isActive: isCurrentTurn),
           ),
         ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: _getPlayerColor(type),
-            fontSize: 8,
-          ),
-        ),
+        // const SizedBox(height: 4),
+        // Container(
+        //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        //   decoration: BoxDecoration(
+        //     color: _getPlayerColor(type).withOpacity(0.1),
+        //     borderRadius: BorderRadius.circular(4),
+        //     border: Border.all(
+        //       color: _getPlayerColor(type).withOpacity(0.3),
+        //       width: 1,
+        //     ),
+        //   ),
+        //   child: Text(
+        //     label,
+        //     style: TextStyle(
+        //       color: _getPlayerColor(type),
+        //       fontWeight: FontWeight.bold,
+        //       fontSize: 10,
+        //     ),
+        //   ),
+       
+        // ),
       ],
     );
   }

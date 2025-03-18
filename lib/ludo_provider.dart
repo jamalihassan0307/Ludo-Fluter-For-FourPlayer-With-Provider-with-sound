@@ -168,22 +168,22 @@ class LudoProvider extends ChangeNotifier {
     _diceResult = 1;
     shouldShowDicePopup = false;
 
-    // Initialize players in clockwise order
+    // Initialize players in the specified order
     if (numberOfPlayers == 4) {
-      // For 4 players: Red -> Green -> Yellow -> Blue (clockwise)
-      players.add(LudoPlayer(LudoPlayerType.red));    // Bottom
-      players.add(LudoPlayer(LudoPlayerType.green));  // Left
-      players.add(LudoPlayer(LudoPlayerType.yellow)); // Top
-      players.add(LudoPlayer(LudoPlayerType.blue));   // Right
+      // For 4 players: Red -> Green -> Yellow -> Blue
+      players.add(LudoPlayer(LudoPlayerType.red));    // Bottom Left
+      players.add(LudoPlayer(LudoPlayerType.green));  // Top Left
+      players.add(LudoPlayer(LudoPlayerType.yellow)); // Top Right
+      players.add(LudoPlayer(LudoPlayerType.blue));   // Bottom Right
     } else if (numberOfPlayers == 3) {
-      // For 3 players: Red -> Yellow -> Blue (clockwise)
-      players.add(LudoPlayer(LudoPlayerType.red));    // Bottom
-      players.add(LudoPlayer(LudoPlayerType.yellow)); // Top
-      players.add(LudoPlayer(LudoPlayerType.blue));   // Right
+      // For 3 players: Red -> Yellow -> Blue
+      players.add(LudoPlayer(LudoPlayerType.red));    // Bottom Left
+      players.add(LudoPlayer(LudoPlayerType.yellow)); // Top Right
+      players.add(LudoPlayer(LudoPlayerType.blue));   // Bottom Right
     } else {
-      // For 2 players: Red -> Blue (opposite corners)
-      players.add(LudoPlayer(LudoPlayerType.red));    // Bottom
-      players.add(LudoPlayer(LudoPlayerType.blue));   // Right
+      // For 2 players: Red -> Yellow
+      players.add(LudoPlayer(LudoPlayerType.red));    // Bottom Left
+      players.add(LudoPlayer(LudoPlayerType.yellow)); // Top Right
     }
 
     currentTurn = players.first.type;
@@ -403,7 +403,7 @@ class LudoProvider extends ChangeNotifier {
       return;
     }
 
-    // Find the next player in clockwise order
+    // Find the next player in the specified order
     int currentIndex = players.indexWhere((player) => player.type == currentTurn);
     int nextIndex;
 
