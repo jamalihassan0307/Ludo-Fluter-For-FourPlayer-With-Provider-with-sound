@@ -39,11 +39,20 @@ dependencies:
   flutter_animate: ^4.3.0
   liquid_swipe: ^3.1.0
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/logo.jpg"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  background_color_ios: "#1a237e"
+  adaptive_icon_background: "#1a237e"
 
 flutter:
   uses-material-design: true
