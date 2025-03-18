@@ -167,28 +167,28 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
         // Green Dice
         Positioned(
           top: 20,
-          left: 20,
+          left: 10,
           child: _buildDiceWithLabel(value, LudoPlayerType.green, "Green", Alignment.centerRight),
         ),
 
         // Yellow Dice
         Positioned(
           top: 20,
-          right: 20,
+          right: 10,
           child: _buildDiceWithLabel(value, LudoPlayerType.yellow, "Yellow", Alignment.centerLeft),
         ),
 
         // Red Dice
         Positioned(
           bottom: 0,
-          left: 20,
+          left: 10,
           child: _buildDiceWithLabel(value, LudoPlayerType.red, "Red", Alignment.centerRight),
         ),
 
         // Blue Dice
         Positioned(
           bottom: 0,
-          right: 20,
+          right: 10,
           child: _buildDiceWithLabel(value, LudoPlayerType.blue, "Blue", Alignment.centerLeft),
         ),
       ],
@@ -493,39 +493,42 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
             ],
           ),
           const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: provider.currentTurnDiceRolls.map((roll) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 6),
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: provider.currentPlayer.color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: provider.currentPlayer.color,
-                      width: 1.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: provider.currentPlayer.color.withOpacity(0.2),
-                        blurRadius: 4,
-                        spreadRadius: 0,
+          Container(
+            height: 50, // Fixed height for dice history
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: provider.currentTurnDiceRolls.map((roll) {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: provider.currentPlayer.color.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: provider.currentPlayer.color,
+                        width: 1.5,
                       ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Image.asset(
-                      "assets/images/dice/$roll.png",
-                      width: 28,
-                      height: 28,
+                      boxShadow: [
+                        BoxShadow(
+                          color: provider.currentPlayer.color.withOpacity(0.2),
+                          blurRadius: 4,
+                          spreadRadius: 0,
+                        ),
+                      ],
                     ),
-                  ),
-                );
-              }).toList(),
+                    child: Center(
+                      child: Image.asset(
+                        "assets/images/dice/$roll.png",
+                        width: 28,
+                        height: 28,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
           ),
         ],
