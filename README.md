@@ -39,6 +39,68 @@ A beautifully designed Flutter Ludo game with modern UI, smooth animations, and 
 
 ## 📸 Screenshots
 
+### Onboarding Experience
+
+<table border="1">
+  <tr>
+    <td align="center">
+      <img src="screenshots/walk_page.png" alt="Welcome" width="250"/>
+      <p><b>Welcome Screen</b></p>
+    </td>
+    <td align="center">
+      <img src="screenshots/walk_page1.png" alt="Walkthrough 1" width="250"/>
+      <p><b>Introduction</b></p>
+    </td>
+    <td align="center">
+      <img src="screenshots/walk_page2.png" alt="Walkthrough 2" width="250"/>
+      <p><b>Features</b></p>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="screenshots/walk_page3.png" alt="Walkthrough 3" width="250"/>
+      <p><b>Game Modes</b></p>
+    </td>
+    <td align="center">
+      <img src="screenshots/walk_page4.png" alt="Walkthrough 4" width="250"/>
+      <p><b>Multiplayer</b></p>
+    </td>
+    <td align="center">
+      <img src="screenshots/walk_page5.png" alt="Walkthrough 5" width="250"/>
+      <p><b>Get Started</b></p>
+    </td>
+  </tr>
+</table>
+
+### Authentication & Login
+
+<table border="1">
+  <tr>
+    <td align="center">
+      <img src="screenshots/login.png" alt="Login" width="250"/>
+      <p><b>Login Screen</b></p>
+    </td>
+    <td align="center">
+      <img src="screenshots/google_login.png" alt="Google Login" width="250"/>
+      <p><b>Google Sign In</b></p>
+    </td>
+    <td align="center">
+      <img src="screenshots/login_loading.png" alt="Loading" width="250"/>
+      <p><b>Loading State</b></p>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="screenshots/signup.png" alt="Sign Up" width="250"/>
+      <p><b>Sign Up</b></p>
+    </td>
+    <td align="center">
+      <img src="screenshots/playoffline.png" alt="Offline Mode" width="250"/>
+      <p><b>Offline Play</b></p>
+    </td>
+  </tr>
+</table>
+
 ### Game Modes & Gameplay
 
 <table border="1">
@@ -56,42 +118,66 @@ A beautifully designed Flutter Ludo game with modern UI, smooth animations, and 
       <p><b>2 Player Mode</b></p>
     </td>
   </tr>
-</table>
-
-### Authentication & Profile
-
-<table border="1">
   <tr>
     <td align="center">
-      <img src="screenshots/google_login.png" alt="Google Login" width="250"/>
-      <p><b>Google Sign In</b></p>
+      <img src="screenshots/ludo_4player1.png" alt="4 Player Gameplay" width="250"/>
+      <p><b>4 Player Gameplay</b></p>
     </td>
     <td align="center">
-      <img src="screenshots/playoffline.png" alt="Offline Mode" width="250"/>
-      <p><b>Offline Play</b></p>
-    </td>
-    <td align="center">
-      <img src="screenshots/signup.png" alt="Sign Up" width="250"/>
-      <p><b>Sign Up Screen</b></p>
+      <img src="screenshots/confirm_exit_game.png" alt="Exit Confirmation" width="250"/>
+      <p><b>Exit Confirmation</b></p>
     </td>
   </tr>
 </table>
 
-### Game Features
+### Game Features & Navigation
 
 <table border="1">
   <tr>
-    <td align="center">
-      <img src="screenshots/selete_move.png" alt="Move Selection" width="250"/>
-      <p><b>Move Selection</b></p>
-    </td>
     <td align="center">
       <img src="screenshots/home_games.png" alt="Home Screen" width="250"/>
       <p><b>Home Screen</b></p>
     </td>
     <td align="center">
-      <img src="screenshots/setting1.png" alt="Settings" width="250"/>
-      <p><b>Settings</b></p>
+      <img src="screenshots/home_games_2.png" alt="Game Selection" width="250"/>
+      <p><b>Game Selection</b></p>
+    </td>
+    <td align="center">
+      <img src="screenshots/friends.png" alt="Friends" width="250"/>
+      <p><b>Friends List</b></p>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="screenshots/leaderboard.png" alt="Leaderboard" width="250"/>
+      <p><b>Leaderboard</b></p>
+    </td>
+    <td align="center">
+      <img src="screenshots/selete_move.png" alt="Move Selection" width="250"/>
+      <p><b>Move Selection</b></p>
+    </td>
+    <td align="center">
+      <img src="screenshots/selete_move2.png" alt="Move Options" width="250"/>
+      <p><b>Move Options</b></p>
+    </td>
+  </tr>
+</table>
+
+### Settings & Configuration
+
+<table border="1">
+  <tr>
+    <td align="center">
+      <img src="screenshots/setting1.png" alt="Settings Main" width="250"/>
+      <p><b>Settings Main</b></p>
+    </td>
+    <td align="center">
+      <img src="screenshots/setting2.png" alt="Settings Audio" width="250"/>
+      <p><b>Audio Settings</b></p>
+    </td>
+    <td align="center">
+      <img src="screenshots/setting3.png" alt="Settings Profile" width="250"/>
+      <p><b>Profile Settings</b></p>
     </td>
   </tr>
 </table>
@@ -182,3 +268,4 @@ The game includes the following sound effects:
 4. Move pieces by selecting them
 5. Follow standard Ludo rules
 6. Get all pieces home to win!
+
