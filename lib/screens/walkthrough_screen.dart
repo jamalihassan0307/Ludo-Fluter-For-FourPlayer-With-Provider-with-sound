@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_swipe/liquid_swipe.dart';
-import 'package:lottie/lottie.dart';
+// import 'package:lottie/lottie.dart';/
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:ludo_flutter/screens/login_screen.dart';
-import 'package:ludo_flutter/constants.dart';
+// import 'package:ludo_flutter/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WalkthroughScreen extends StatefulWidget {
-  const WalkthroughScreen({Key? key}) : super(key: key);
+  const WalkthroughScreen({super.key});
 
   @override
   State<WalkthroughScreen> createState() => _WalkthroughScreenState();

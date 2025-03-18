@@ -236,8 +236,8 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   Widget _buildDicePositions(LudoProvider value) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    final boardSize = screenWidth * 0.8; // Approximate board size
-    final diceOffset = boardSize * 0.15; // Offset from board edge
+    // final boardSize = screenWidth * 0.8; // Approximate board size
+    // final diceOffset = boardSize * 0.15; // Offset from board edge
 
     return Stack(
       children: [

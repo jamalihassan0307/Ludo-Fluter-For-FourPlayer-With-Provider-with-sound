@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:ludo_flutter/main_screen.dart';
 import 'package:ludo_flutter/providers/user_provider.dart';
@@ -7,10 +9,10 @@ import 'package:ludo_flutter/constants.dart';
 import 'package:ludo_flutter/screens/settings_page.dart';
 // import 'package:ludo_flutter/screens/profile_page.dart';
 // import 'dart:math' as math;
-import 'dart:ui';
+// import 'dart:ui';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -35,20 +37,20 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
-    final size = MediaQuery.of(context).size;
+    // final size = MediaQuery.of(context).size;
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFF1a237e), // Deep Blue
-              const Color(0xFF4a148c), // Deep Purple
-              const Color(0xFF311b92), // Deep Indigo
+              Color(0xFF1a237e), // Deep Blue
+              Color(0xFF4a148c), // Deep Purple
+              Color(0xFF311b92), // Deep Indigo
             ],
-            stops: const [0.0, 0.5, 1.0],
+            stops: [0.0, 0.5, 1.0],
           ),
         ),
         child: SafeArea(
@@ -320,6 +322,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 onExit: (_) => setState(() => isHovered = false),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
+                  // ignore: dead_code
                   transform: isHovered ? (Matrix4.identity()..scale(1.02)) : Matrix4.identity(),
                   child: GestureDetector(
                     onTap: isComingSoon
@@ -338,14 +341,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
+                            // ignore: dead_code
                             color: color.withOpacity(isHovered ? 0.4 : 0.3),
+                            // ignore: dead_code
                             blurRadius: isHovered ? 16 : 12,
+                            // ignore: dead_code
                             spreadRadius: isHovered ? 3 : 2,
                             offset: const Offset(0, 6),
                           ),
                         ],
                         border: Border.all(
+                          // ignore: dead_code
                           color: color.withOpacity(isHovered ? 0.2 : 0.1),
+                          // ignore: dead_code
                           width: 1,
                         ),
                       ),

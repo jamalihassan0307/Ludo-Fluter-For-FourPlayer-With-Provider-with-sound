@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+// import 'package:flutter/scheduler.dart';
 import 'package:ludo_flutter/screens/login_screen.dart';
 import 'package:ludo_flutter/screens/walkthrough_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:ludo_flutter/main_screen.dart';
+// import 'package:ludo_flutter/main_screen.dart';
 import 'package:ludo_flutter/home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ludo_flutter/ludo_provider.dart';
-import 'package:ludo_flutter/screens/splash_screen.dart';
+// import 'package:ludo_flutter/screens/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ludo_flutter/providers/user_provider.dart';
 
-import 'ludo_provider.dart';
+// import 'ludo_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +21,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
