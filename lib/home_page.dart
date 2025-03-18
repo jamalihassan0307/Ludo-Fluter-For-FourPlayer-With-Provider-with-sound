@@ -43,280 +43,367 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              LudoColor.blue.withOpacity(0.9),
-              LudoColor.green.withOpacity(0.7),
+              const Color(0xFF1a237e), // Deep Blue
+              const Color(0xFF4a148c), // Deep Purple
+              const Color(0xFF311b92), // Deep Indigo
             ],
+            stops: const [0.0, 0.5, 1.0],
           ),
         ),
         child: SafeArea(
-          child: Column(
+          child: Stack(
             children: [
-              // Top Bar with Profile
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _showProfileMenu = !_showProfileMenu;
-                        });
-                      },
-                      child: Stack(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: CircleAvatar(
-                              radius: 25,
-                              backgroundColor: Colors.white,
-                              backgroundImage: user?.photoURL != null ? NetworkImage(user!.photoURL!) : null,
-                              child: user?.photoURL == null ? const Icon(Icons.person, color: Colors.grey) : null,
-                            ),
-                          ),
-                          Positioned(
-                            right: 0,
-                            bottom: 0,
-                            child: Container(
-                              width: 15,
-                              height: 15,
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Welcome back,",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white.withOpacity(0.9),
-                            ),
-                          ),
-                          Text(
-                            user?.name ?? "Player",
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
+              // Animated background patterns
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: BackgroundPatternPainter(),
+                ),
+              ),
+              Column(
+                children: [
+                  // Top Bar with Profile
+                  _buildTopBar(user),
+
+                  // Profile Menu (conditionally shown)
+                  if (_showProfileMenu) _buildProfileMenu(context, user),
+
+                  // Stats Cards with Animation
+                  _buildStatsSection(user),
+
+                  // Tab Bar
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(
                         color: Colors.white.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: TabBar(
+                      controller: _tabController,
+                      indicator: BoxDecoration(
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.3),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                          ),
+                        ],
                       ),
-                      child: IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const SettingsPage()),
-                          );
-                        },
-                        icon: const Icon(Icons.settings, color: Colors.white),
-                        tooltip: 'Settings',
+                      labelColor: const Color(0xFF1a237e),
+                      unselectedLabelColor: Colors.white,
+                      labelStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
                       ),
+                      tabs: const [
+                        Tab(text: "Play"),
+                        Tab(text: "Friends"),
+                        Tab(text: "Leaderboard"),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-
-              // Profile Menu (conditionally shown)
-              if (_showProfileMenu) _buildProfileMenu(context, user),
-
-              // Stats Cards with Animation
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    _buildAnimatedStatCard(
-                      "Games Played",
-                      "${user?.stats['gamesPlayed'] ?? 0}",
-                      Icons.sports_esports,
-                      LudoColor.blue,
-                    ),
-                    const SizedBox(width: 16),
-                    _buildAnimatedStatCard(
-                      "Games Won",
-                      "${user?.stats['gamesWon'] ?? 0}",
-                      Icons.emoji_events,
-                      LudoColor.yellow,
-                    ),
-                  ],
-                ),
-              ),
-
-              // Tab Bar
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: TabBar(
-                  controller: _tabController,
-                  indicator: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
                   ),
-                  labelColor: LudoColor.blue,
-                  unselectedLabelColor: Colors.white,
-                  tabs: const [
-                    Tab(text: "Play"),
-                    Tab(text: "Friends"),
-                    Tab(text: "Leaderboard"),
-                  ],
-                ),
-              ),
 
-              // Game Modes
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildPlayTab(context),
-                    _buildFriendsTab(),
-                    _buildLeaderboardTab(),
-                  ],
-                ),
+                  // Game Modes
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildPlayTab(context),
+                        _buildFriendsTab(),
+                        _buildLeaderboardTab(),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Quick play functionality
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MainScreen(numberOfPlayers: 4),
-            ),
-          );
-        },
-        backgroundColor: LudoColor.yellow,
-        child: const Icon(Icons.play_arrow),
-      ),
-    );
-  }
-
-  Widget _buildProfileMenu(BuildContext context, dynamic user) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          const Divider(height: 1),
-          ListTile(
-            leading: const Icon(Icons.settings, color: LudoColor.green),
-            title: const Text('Settings'),
-            onTap: () {
-              setState(() {
-                _showProfileMenu = false;
-              });
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
-              );
-            },
-          ),
-          const Divider(height: 1),
-          ListTile(
-            leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text('Sign Out'),
-            onTap: () async {
-              setState(() {
-                _showProfileMenu = false;
-              });
-              await context.read<UserProvider>().signOut();
-              if (mounted) {
-                Navigator.pushReplacementNamed(context, '/login');
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAnimatedStatCard(String title, String value, IconData icon, Color color) {
-    return Expanded(
-      child: TweenAnimationBuilder(
-        tween: Tween<double>(begin: 0, end: 1),
+      floatingActionButton: TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0.0, end: 1.0),
         duration: const Duration(milliseconds: 800),
-        curve: Curves.easeOutBack,
-        builder: (context, double value, child) {
+        curve: Curves.elasticOut,
+        builder: (context, value, child) {
           return Transform.scale(
             scale: value,
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
+            child: FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainScreen(numberOfPlayers: 4),
                   ),
-                ],
+                );
+              },
+              backgroundColor: LudoColor.yellow,
+              icon: const Icon(Icons.play_arrow),
+              label: const Text(
+                "Quick Play",
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              child: Column(
-                children: [
-                  Icon(icon, color: color, size: 30),
-                  const SizedBox(height: 8),
-                  Text(
-                    value.toString(),
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
+              elevation: 8,
             ),
           );
         },
       ),
+    );
+  }
+
+  Widget _buildTopBar(dynamic user) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _showProfileMenu = !_showProfileMenu;
+              });
+            },
+            child: Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.2),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.white,
+                    backgroundImage: user?.photoURL != null ? NetworkImage(user!.photoURL!) : null,
+                    child: user?.photoURL == null ? const Icon(Icons.person, color: Colors.grey) : null,
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 15,
+                    height: 15,
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.green.withOpacity(0.3),
+                          blurRadius: 4,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Welcome back,",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white.withOpacity(0.9),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                Text(
+                  user?.name ?? "Player",
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                );
+              },
+              icon: const Icon(Icons.settings, color: Colors.white),
+              tooltip: 'Settings',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsSection(dynamic user) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        children: [
+          _buildAnimatedStatCard(
+            "Games Played",
+            "${user?.stats['gamesPlayed'] ?? 0}",
+            Icons.sports_esports,
+            const Color(0xFF64B5F6), // Light Blue
+          ),
+          const SizedBox(width: 16),
+          _buildAnimatedStatCard(
+            "Games Won",
+            "${user?.stats['gamesWon'] ?? 0}",
+            Icons.emoji_events,
+            const Color(0xFFFFD54F), // Amber
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGameModeCard(
+    BuildContext context,
+    String title,
+    String subtitle,
+    int players,
+    Color color, {
+    bool isComingSoon = false,
+  }) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutBack,
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: value,
+          child: GestureDetector(
+            onTap: isComingSoon
+                ? null
+                : () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MainScreen(numberOfPlayers: players),
+                      ),
+                    );
+                  },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.sports_esports, color: color, size: 40),
+                        const SizedBox(height: 12),
+                        Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: color,
+                          ),
+                        ),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (isComingSoon)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.lock_clock,
+                              color: Colors.white,
+                              size: 32,
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Text(
+                                "Coming Soon",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -347,6 +434,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
           ),
           const SizedBox(height: 20),
@@ -361,28 +449,28 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   "2 Players",
                   "Classic duel mode",
                   2,
-                  Colors.blue,
+                  const Color(0xFF42A5F5), // Blue
                 ),
                 _buildGameModeCard(
                   context,
                   "3 Players",
                   "Triple threat",
                   3,
-                  Colors.green,
+                  const Color(0xFF66BB6A), // Green
                 ),
                 _buildGameModeCard(
                   context,
                   "4 Players",
                   "Full board experience",
                   4,
-                  Colors.orange,
+                  const Color(0xFFFFB74D), // Orange
                 ),
                 _buildGameModeCard(
                   context,
                   "Online",
                   "Play with friends",
                   4,
-                  Colors.purple,
+                  const Color(0xFF9575CD), // Purple
                   isComingSoon: true,
                 ),
               ],
@@ -525,84 +613,144 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildGameModeCard(
-    BuildContext context,
-    String title,
-    String subtitle,
-    int players,
-    Color color, {
-    bool isComingSoon = false,
-  }) {
-    return GestureDetector(
-      onTap: isComingSoon
-          ? null
-          : () {
+  Widget _buildProfileMenu(BuildContext context, dynamic user) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.settings, color: LudoColor.green),
+            title: const Text('Settings'),
+            onTap: () {
+              setState(() {
+                _showProfileMenu = false;
+              });
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => MainScreen(numberOfPlayers: players),
-                ),
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
               );
             },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text('Sign Out'),
+            onTap: () async {
+              setState(() {
+                _showProfileMenu = false;
+              });
+              await context.read<UserProvider>().signOut();
+              if (mounted) {
+                Navigator.pushReplacementNamed(context, '/login');
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnimatedStatCard(String title, String value, IconData icon, Color color) {
+    return Expanded(
+      child: TweenAnimationBuilder(
+        tween: Tween<double>(begin: 0, end: 1),
+        duration: const Duration(milliseconds: 800),
+        curve: Curves.easeOutBack,
+        builder: (context, double value, child) {
+          return Transform.scale(
+            scale: value,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.sports_esports, color: color, size: 40),
-                  const SizedBox(height: 12),
+                  Icon(icon, color: color, size: 30),
+                  const SizedBox(height: 8),
                   Text(
-                    title,
+                    value.toString(),
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: color,
                     ),
                   ),
                   Text(
-                    subtitle,
+                    title,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 14,
                       color: Colors.grey[600],
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
             ),
-            if (isComingSoon)
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Center(
-                  child: Text(
-                    "Coming Soon",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
+}
+
+class BackgroundPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.05)
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+
+    // Draw diagonal lines
+    const spacing = 30.0;
+    for (double i = -size.height; i < size.width + size.height; i += spacing) {
+      canvas.drawLine(
+        Offset(i, 0),
+        Offset(i + size.height, size.height),
+        paint,
+      );
+    }
+
+    // Draw circles
+    final circlePaint = Paint()
+      ..color = Colors.white.withOpacity(0.03)
+      ..style = PaintingStyle.fill;
+
+    for (int i = 0; i < 20; i++) {
+      final radius = (i * 40.0) % 120 + 20;
+      canvas.drawCircle(
+        Offset(size.width * 0.2, size.height * 0.3),
+        radius,
+        circlePaint,
+      );
+      canvas.drawCircle(
+        Offset(size.width * 0.8, size.height * 0.7),
+        radius,
+        circlePaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
