@@ -356,7 +356,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       ),
                       // Content
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(12.0),
                         child: LayoutBuilder(
                           builder: (context, constraints) {
                             return Column(
@@ -372,18 +372,25 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       color: color.withOpacity(0.2),
                                       width: 2,
                                     ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: color.withOpacity(0.2),
+                                        blurRadius: 8,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
                                   ),
                                   child: Icon(
                                     Icons.sports_esports,
                                     color: color,
-                                    size: 28,
+                                    size: 24,
                                   ),
                                 ),
-                                const SizedBox(height: 12),
+                                const SizedBox(height: 8),
                                 Text(
                                   title,
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: color,
                                     letterSpacing: 0.5,
@@ -393,7 +400,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 Text(
                                   subtitle,
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 11,
                                     color: Colors.grey[600],
                                     height: 1.2,
                                   ),
@@ -402,7 +409,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 if (!isComingSoon) ...[
-                                  const SizedBox(height: 12),
+                                  const SizedBox(height: 8),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 12,
@@ -415,6 +422,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                         color: color.withOpacity(0.2),
                                         width: 1,
                                       ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: color.withOpacity(0.1),
+                                          blurRadius: 4,
+                                          spreadRadius: 0,
+                                        ),
+                                      ],
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -422,7 +436,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                         Icon(
                                           Icons.play_arrow_rounded,
                                           color: color,
-                                          size: 16,
+                                          size: 14,
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
@@ -456,7 +470,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Container(
-                                        padding: const EdgeInsets.all(12),
+                                        padding: const EdgeInsets.all(10),
                                         decoration: BoxDecoration(
                                           color: Colors.white.withOpacity(0.1),
                                           shape: BoxShape.circle,
@@ -464,10 +478,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                         child: const Icon(
                                           Icons.lock_clock,
                                           color: Colors.white,
-                                          size: 28,
+                                          size: 24,
                                         ),
                                       ),
-                                      const SizedBox(height: 12),
+                                      const SizedBox(height: 8),
                                       Container(
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 12,
@@ -486,7 +500,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 12,
+                                            fontSize: 11,
                                             letterSpacing: 0.5,
                                           ),
                                         ),
@@ -512,7 +526,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget _buildPlayTab(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.only(
@@ -538,6 +552,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 decoration: BoxDecoration(
                   color: const Color(0xFF1a237e).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF1a237e).withOpacity(0.1),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                    ),
+                  ],
                 ),
                 child: const Icon(
                   Icons.sports_esports,
@@ -552,7 +573,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   Text(
                     "Game Modes",
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
                     ),
@@ -560,7 +581,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   Text(
                     "Select your preferred way to play",
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       color: Colors.grey,
                       letterSpacing: 0.2,
                     ),
@@ -569,12 +590,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
-              mainAxisSpacing: 20,
-              crossAxisSpacing: 20,
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
+              childAspectRatio: 0.85,
               children: [
                 _buildGameModeCard(
                   context,
