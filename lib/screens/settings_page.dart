@@ -39,8 +39,8 @@ class _SettingsPageState extends State<SettingsPage> {
     final user = context.read<UserProvider>().user;
     if (user != null) {
       setState(() {
-        _selectedTheme = user.settings['theme'] ?? 'System';
-        _selectedLanguage = user.settings['language'] ?? 'English';
+        // _selectedTheme = user.settings['theme'] ?? 'System';
+        // _selectedLanguage = user.settings['language'] ?? 'English';
       });
     }
   }
