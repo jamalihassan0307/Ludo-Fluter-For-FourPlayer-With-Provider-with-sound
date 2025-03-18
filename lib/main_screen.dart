@@ -58,54 +58,56 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Colors.blue.shade200,
-                Colors.purple.shade100,
-                Colors.white,
+                const Color(0xFF2C3E50),
+                const Color(0xFF3498DB),
+                Colors.purple.shade300,
               ],
-              stops: const [0.0, 0.3, 1.0],
+              stops: const [0.0, 0.5, 1.0],
             ),
           ),
           child: SafeArea(
-            child: Column(
+            child: Stack(
               children: [
-                _buildGameHeader(value),
-                Expanded(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Background pattern
-                      Positioned.fill(
-                        child: CustomPaint(
-                          painter: BackgroundPatternPainter(),
-                        ),
-                      ),
-                      // Game Board
-                      const BoardWidget(),
-                      // Turn Indicator
-                      if (_showTurnIndicator)
-                        AnimatedBuilder(
-                          animation: _animationController,
-                          builder: (context, child) {
-                            return Container(
-                              width: 250,
-                              height: 250,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: value.currentPlayer.color.withOpacity(_animationController.value * 0.3),
-                                  width: 3,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      _buildDicePositions(value),
-                      if (value.winners.length == (widget.numberOfPlayers - 1))
-                        _buildGameOverScreen(value),
-                    ],
+                // Animated background patterns
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: AnimatedBackgroundPainter(),
                   ),
                 ),
-                _buildGameFooter(value),
+                Column(
+                  children: [
+                    _buildGameHeader(value),
+                    Expanded(
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          const BoardWidget(),
+                          if (_showTurnIndicator)
+                            AnimatedBuilder(
+                              animation: _animationController,
+                              builder: (context, child) {
+                                return Container(
+                                  width: 250,
+                                  height: 250,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: value.currentPlayer.color.withOpacity(_animationController.value * 0.3),
+                                      width: 3,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          _buildDicePositions(value),
+                          if (value.winners.length == (widget.numberOfPlayers - 1))
+                            _buildGameOverScreen(value),
+                        ],
+                      ),
+                    ),
+                    _buildGameFooter(value),
+                  ],
+                ),
               ],
             ),
           ),
@@ -115,7 +117,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
           scale: _showTurnIndicator ? 0.8 : 1.0,
           child: FloatingActionButton(
             backgroundColor: value.currentPlayer.color,
-            elevation: 4,
+            elevation: 8,
             child: const Icon(Icons.help_outline),
             onPressed: () {
               setState(() {
@@ -137,43 +139,23 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.95),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            spreadRadius: 2,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         children: [
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => Navigator.pop(context),
-              ),
-              const Expanded(
-                child: Text(
-                  "Ludo Game",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: () {
-                  provider.startGame(numberOfPlayers: widget.numberOfPlayers);
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          _buildPointsDisplay(provider),
+         _buildPointsDisplay(provider),
         ],
       ),
     );
@@ -283,12 +265,17 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.95),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -3),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            spreadRadius: 2,
+            offset: const Offset(0, -4),
           ),
         ],
       ),
@@ -297,16 +284,8 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "${provider.currentPlayer.type.name}'s Turn",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: provider.currentPlayer.color,
-                ),
-              ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: provider.currentPlayer.color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -314,8 +293,37 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.casino, color: provider.currentPlayer.color, size: 16),
-                    const SizedBox(width: 4),
+                    Icon(Icons.person, color: provider.currentPlayer.color),
+                    const SizedBox(width: 8),
+                    Text(
+                      "${provider.currentPlayer.type.name}'s Turn",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: provider.currentPlayer.color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: provider.currentPlayer.color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: provider.currentPlayer.color),
+                  boxShadow: [
+                    BoxShadow(
+                      color: provider.currentPlayer.color.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.casino, color: provider.currentPlayer.color),
+                    const SizedBox(width: 8),
                     Text(
                       "Roll: ${provider.currentTurnDiceRolls.isNotEmpty ? provider.currentTurnDiceRolls.last : '-'}",
                       style: TextStyle(
@@ -328,51 +336,89 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           _buildDiceHistory(provider),
         ],
       ),
     );
   }
 
-  // Add a method to build the points display
   Widget _buildPointsDisplay(LudoProvider provider) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: provider.players.map((player) {
           final isCurrentTurn = provider.currentTurn == player.type;
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: isCurrentTurn ? player.color.withOpacity(0.2) : Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(15),
               border: Border.all(
                 color: isCurrentTurn ? player.color : Colors.transparent,
                 width: 2,
               ),
+              boxShadow: isCurrentTurn ? [
+                BoxShadow(
+                  color: player.color.withOpacity(0.3),
+                  blurRadius: 8,
+                  spreadRadius: 0,
+                ),
+              ] : null,
             ),
             child: Column(
               children: [
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: player.color,
-                    shape: BoxShape.circle,
-                  ),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: player.color,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: player.color.withOpacity(0.3),
+                            blurRadius: 6,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (isCurrentTurn)
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: player.color.withOpacity(0.5),
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
                   "${provider.playerPoints[player.type] ?? 0}",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 18,
                     color: player.color,
                   ),
                 ),
@@ -381,6 +427,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                   style: TextStyle(
                     fontSize: 12,
                     color: player.color,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -391,13 +438,19 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
     );
   }
 
-  // Add a method to build the dice history
   Widget _buildDiceHistory(LudoProvider provider) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -405,44 +458,75 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "Dice History",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[700],
-                ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.history,
+                    color: Colors.grey[700],
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "Dice History",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                "${provider.currentTurnDiceRolls.length} rolls",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: provider.currentPlayer.color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  "${provider.currentTurnDiceRolls.length} rolls",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: provider.currentPlayer.color,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: provider.currentTurnDiceRolls.map((roll) {
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: provider.currentPlayer.color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: provider.currentPlayer.color),
-                ),
-                child: Center(
-                  child: Image.asset(
-                    "assets/images/dice/$roll.png",
-                    width: 24,
-                    height: 24,
+          const SizedBox(height: 12),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: provider.currentTurnDiceRolls.map((roll) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 6),
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: provider.currentPlayer.color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: provider.currentPlayer.color,
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: provider.currentPlayer.color.withOpacity(0.2),
+                        blurRadius: 4,
+                        spreadRadius: 0,
+                      ),
+                    ],
                   ),
-                ),
-              );
-            }).toList(),
+                  child: Center(
+                    child: Image.asset(
+                      "assets/images/dice/$roll.png",
+                      width: 28,
+                      height: 28,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
           ),
         ],
       ),
@@ -813,27 +897,40 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   }
 }
 
-class BackgroundPatternPainter extends CustomPainter {
+class AnimatedBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
+      ..color = Colors.white.withOpacity(0.05)
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 
-    const spacing = 20.0;
-    for (double i = 0; i < size.width; i += spacing) {
+    // Draw diagonal lines
+    const spacing = 30.0;
+    for (double i = -size.height; i < size.width + size.height; i += spacing) {
       canvas.drawLine(
         Offset(i, 0),
-        Offset(i, size.height),
+        Offset(i + size.height, size.height),
         paint,
       );
     }
-    for (double i = 0; i < size.height; i += spacing) {
-      canvas.drawLine(
-        Offset(0, i),
-        Offset(size.width, i),
-        paint,
+
+    // Draw circles
+    final circlePaint = Paint()
+      ..color = Colors.white.withOpacity(0.03)
+      ..style = PaintingStyle.fill;
+
+    for (int i = 0; i < 20; i++) {
+      final radius = (i * 40.0) % 120 + 20;
+      canvas.drawCircle(
+        Offset(size.width * 0.2, size.height * 0.3),
+        radius,
+        circlePaint,
+      );
+      canvas.drawCircle(
+        Offset(size.width * 0.8, size.height * 0.7),
+        radius,
+        circlePaint,
       );
     }
   }

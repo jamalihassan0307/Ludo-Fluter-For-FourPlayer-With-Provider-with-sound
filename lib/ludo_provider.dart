@@ -44,7 +44,7 @@ class LudoProvider extends ChangeNotifier {
   LudoPlayer get currentPlayer {
     if (players.isEmpty) {
       // Initialize players if empty
-      startGame();
+      startGame(numberOfPlayers: 4);
     }
 
     try {
@@ -159,34 +159,34 @@ class LudoProvider extends ChangeNotifier {
 
   int _numberOfPlayers = 4;
 
-  void startGame({int numberOfPlayers = 4}) {
-    _numberOfPlayers = numberOfPlayers;
-    winners.clear();
+  void startGame({required int numberOfPlayers}) {
     players.clear();
+    winners.clear();
+    currentTurnDiceRolls.clear();
     _gameState = LudoGameState.throwDice;
-    _diceResult = 0;
-    _consecutiveSixes = 0;
-    _isMoving = false;
-    _stopMoving = false;
+    _diceStarted = false;
+    _diceResult = 1;
+    shouldShowDicePopup = false;
 
-    // Add players based on number selected
-    players.add(LudoPlayer(LudoPlayerType.red));
-
-    if (numberOfPlayers >= 2) {
-      players.add(LudoPlayer(LudoPlayerType.yellow));
-    }
-
-    if (numberOfPlayers >= 3) {
-      players.add(LudoPlayer(LudoPlayerType.green));
-    }
-
+    // Initialize players in the correct order based on number of players
     if (numberOfPlayers == 4) {
+      // For 4 players: Red -> Green -> Yellow -> Blue
+      players.add(LudoPlayer(LudoPlayerType.red));
+      players.add(LudoPlayer(LudoPlayerType.green));
+      players.add(LudoPlayer(LudoPlayerType.yellow));
+      players.add(LudoPlayer(LudoPlayerType.blue));
+    } else if (numberOfPlayers == 3) {
+      // For 3 players: clockwise arrangement
+      players.add(LudoPlayer(LudoPlayerType.red));
+      players.add(LudoPlayer(LudoPlayerType.yellow));
+      players.add(LudoPlayer(LudoPlayerType.blue));
+    } else {
+      // For 2 players: opposite corners
+      players.add(LudoPlayer(LudoPlayerType.red));
       players.add(LudoPlayer(LudoPlayerType.blue));
     }
 
-    // Set current turn to the first player (red)
-    currentTurn = LudoPlayerType.red;
-
+    currentTurn = players.first.type;
     notifyListeners();
   }
 
@@ -397,15 +397,22 @@ class LudoProvider extends ChangeNotifier {
 
   ///Next turn will be called when the player finish the turn
   void nextTurn() {
+    if (winners.length == players.length - 1) {
+      _gameState = LudoGameState.finish;
+      notifyListeners();
+      return;
+    }
+
+    int currentIndex = players.indexWhere((player) => player.type == currentTurn);
+    int nextIndex;
+
+    do {
+      nextIndex = (currentIndex + 1) % players.length;
+      currentIndex = nextIndex;
+    } while (winners.contains(players[nextIndex].type));
+
+    currentTurn = players[nextIndex].type;
     currentTurnDiceRolls.clear();
-    shouldShowDicePopup = false;
-
-    int currentIndex = players.indexWhere((p) => p.type == currentTurn);
-    if (currentIndex == -1) currentIndex = 0; // Fallback to first player if not found
-    currentIndex = (currentIndex + 1) % players.length;
-    currentTurn = players[currentIndex].type;
-
-    if (winners.contains(currentTurn)) return nextTurn();
     _gameState = LudoGameState.throwDice;
     notifyListeners();
   }
