@@ -12,6 +12,11 @@
     <img alt="Firebase" src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" />
 </p>
 
+## 📸 Banner
+<p align="center">
+    <img src="screenshots/ludo_banner.png" alt="Ludo Game Banner" width="100%"/>
+</p>
+
 ## 📌 Overview
 
 A beautifully designed Flutter Ludo game with modern UI, smooth animations, and multiple game modes. The app features both online and offline gameplay, sound effects, and a comprehensive player profile system.
