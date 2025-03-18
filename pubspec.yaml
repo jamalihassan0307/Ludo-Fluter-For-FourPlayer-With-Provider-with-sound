@@ -47,11 +47,8 @@ dev_dependencies:
 
 flutter_launcher_icons:
   android: "ic_launcher"
-  ios: true
   image_path: "assets/logo.jpg"
   min_sdk_android: 21
-  remove_alpha_ios: true
-  background_color_ios: "#1a237e"
   adaptive_icon_background: "#1a237e"
 
 flutter:
